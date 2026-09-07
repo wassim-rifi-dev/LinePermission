@@ -7,6 +7,7 @@ import ma.youcode.lineperm.exceptions.UserAlreadyExisteException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -38,7 +39,7 @@ public class AuthService {
 
             UserService.users.put(username, hashedPassword);
 
-            Files.writeString(userfile, userWriting + System.lineSeparator());
+            Files.writeString(userfile, userWriting + System.lineSeparator() , StandardOpenOption.APPEND);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
