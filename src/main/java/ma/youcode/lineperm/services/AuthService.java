@@ -1,5 +1,6 @@
 package ma.youcode.lineperm.services;
 
+import ma.youcode.lineperm.constants.FilePaths;
 import ma.youcode.lineperm.exceptions.InvalidPasswordException;
 import ma.youcode.lineperm.exceptions.UserAlreadyExisteException;
 
@@ -29,7 +30,7 @@ public class AuthService {
         }
 
         try {
-            Path userfile = Path.of("src/main/resources/data/users.txt");
+            Path userfile = Path.of(FilePaths.userFile);
 
             String hashedPassword = hashPassword(password);
 
