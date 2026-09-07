@@ -14,7 +14,7 @@ public class UserService {
 
     private void loadUsers() {
         try {
-            Path userfile = Path.of("/src/main/resources/data/users.txt");
+            Path userfile = Path.of("src/main/resources/data/users.txt");
 
             List<String> lines = Files.readAllLines(userfile);
 
