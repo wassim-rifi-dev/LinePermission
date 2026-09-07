@@ -31,4 +31,16 @@ public class ConsoleApp {
 
         return new String[] {username , password};
     }
+
+    public String[] loginChoix() {
+        System.out.println("Entrer votre information.");
+
+        System.out.print("username : ");
+        String username = scanner.nextLine();
+
+        System.out.print("password : ");
+        String password = scanner.nextLine();
+
+        return new String[] {username , password};
+    }
 }

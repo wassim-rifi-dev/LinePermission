@@ -22,19 +22,31 @@ public class LinePermissionMain {
 
         new LinePermissionMain(consoleApp , authService , userService);
 
-        switch (consoleApp.choix) {
-            case "signup":
-                String[] informations = consoleApp.singUpChoix();
+        do {
+            switch (consoleApp.choix) {
+                case "signup":
+                    String[] singupInformations = consoleApp.singUpChoix();
 
-                String username = informations[0];
-                String password = informations[1];
+                    String signUpUsername = singupInformations[0];
+                    String signUpPassword = singupInformations[1];
 
-                authService.singUp(username, password);
-                break;
-            
-            default:
-                System.out.println("Choix don't existe.");
-                break;
-        }
+                    authService.singUp(signUpUsername, signUpPassword);
+                    break;
+
+                case "login":
+                    String[] loginInformations = consoleApp.singUpChoix();
+
+                    String loginUsername = loginInformations[0];
+                    String loginPassword = loginInformations[1];
+
+                    authService.login(loginUsername, loginPassword);
+                    break;
+
+                
+                default:
+                    System.out.println("Choix don't existe.");
+                    break;
+            }
+        } while (consoleApp.choix != "exit");
     }
 }
