@@ -42,11 +42,15 @@ public class LinePermissionMain {
                     authService.login(loginUsername, loginPassword);
                     break;
 
+                case "exit":
+                    System.out.println("Au revoir.");
+                    break;
+
                 
                 default:
                     System.out.println("Choix don't existe.");
                     break;
             }
-        } while (consoleApp.choix != "exit");
+        } while (consoleApp.choix == "exit");
     }
 }
