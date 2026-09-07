@@ -10,7 +10,7 @@ import ma.youcode.lineperm.constants.FilePaths;
 public class UserService {
     public static HashMap<String , String> users = new HashMap<>();
 
-    UserService() {
+    public UserService() {
         loadUsers();
     }
 
