@@ -3,7 +3,7 @@ package ma.youcode.lineperm.ui;
 import java.util.Scanner;
 
 public class ConsoleApp {
-    String choix;
+    public String choix;
 
     Scanner scanner = new Scanner(System.in);
     
@@ -14,9 +14,21 @@ public class ConsoleApp {
     public void start() {
         System.out.println("====================== LinePerm ====================");
 
-        System.out.println("Non Connecte ? Commandes : singup | login | help | exit\n");
+        System.out.println("Non Connecte ? Commandes : signup | login | help | exit\n");
 
         System.out.print("lineperm> ");
         choix = scanner.nextLine();
+    }
+
+    public String[] singUpChoix() {
+        System.out.println("Entrer votre information.");
+
+        System.out.print("username : ");
+        String username = scanner.nextLine();
+
+        System.out.print("password : ");
+        String password = scanner.nextLine();
+
+        return new String[] {username , password};
     }
 }
