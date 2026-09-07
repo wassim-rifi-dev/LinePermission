@@ -1,23 +1,21 @@
 package ma.youcode.lineperm.models;
 
-import org.mindrot.jbcrypt.BCrypt;
-
 public class User {
+    private String username;
+
+    private String password;
+
     User(String username , String password) {
         setUsername(username);
         setPassword(password);
     }
 
-    private String username;
-
-    private String password;
-
     public String getUsername() {
-        return  this.username;
+        return this.username;
     }
 
     public String getPassword() {
-        return  this.password;
+        return this.password;
     }
 
     public void setUsername(String username) {
@@ -25,10 +23,6 @@ public class User {
     }
 
     public void setPassword(String password) {
-        this.password = hashPassword(password);
-    }
-
-    private String hashPassword(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt());
+        this.password = password;
     }
 }
