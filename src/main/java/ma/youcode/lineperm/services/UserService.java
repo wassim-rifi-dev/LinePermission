@@ -6,8 +6,8 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class UserService {
-    HashMap<String , String> users = new HashMap<>();
-    
+    public static HashMap<String , String> users = new HashMap<>();
+
     UserService() {
         loadUsers();
     }
