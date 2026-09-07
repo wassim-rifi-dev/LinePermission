@@ -29,7 +29,7 @@ public class AuthService {
         }
 
         try {
-            Path userfile = Path.of("../../../../../resources/data/users.txt");
+            Path userfile = Path.of("src/main/resources/data/users.txt");
 
             String hashedPassword = hashPassword(password);
 
