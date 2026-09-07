@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+import ma.youcode.lineperm.constants.FilePaths;
+
 public class UserService {
     public static HashMap<String , String> users = new HashMap<>();
 
@@ -14,7 +16,7 @@ public class UserService {
 
     private void loadUsers() {
         try {
-            Path userfile = Path.of("../../../../../resources/data/users.txt");
+            Path userfile = Path.of(FilePaths.userFile);
 
             List<String> lines = Files.readAllLines(userfile);
 

@@ -1,11 +1,13 @@
 package ma.youcode.lineperm.services;
 
+import ma.youcode.lineperm.constants.FilePaths;
 import ma.youcode.lineperm.exceptions.InvalidPasswordException;
 import ma.youcode.lineperm.exceptions.UserAlreadyExisteException;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -20,6 +22,10 @@ public class AuthService {
             }
 
             isAuth = true;
+
+            System.out.println(isAuth);
+        } else {
+            System.out.println("Username not exeste.");
         }
     }
 
@@ -29,7 +35,7 @@ public class AuthService {
         }
 
         try {
-            Path userfile = Path.of("../../../../../resources/data/users.txt");
+            Path userfile = Path.of(FilePaths.userFile);
 
             String hashedPassword = hashPassword(password);
 
@@ -37,7 +43,7 @@ public class AuthService {
 
             UserService.users.put(username, hashedPassword);
 
-            Files.writeString(userfile, userWriting + System.lineSeparator());
+            Files.writeString(userfile, userWriting + System.lineSeparator() , StandardOpenOption.APPEND);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
