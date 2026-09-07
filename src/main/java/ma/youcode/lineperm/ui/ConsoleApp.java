@@ -1,4 +1,4 @@
-package ma.youcode.lineperm;
+package ma.youcode.lineperm.ui;
 
 public class ConsoleApp {
     
