@@ -1,12 +1,12 @@
 package ma.youcode.lineperm.services;
 
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-
-import ma.youcode.lineperm.models.User;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
 public class UserService {
-    HashMap<String , User> users = new HashMap<>();
+    HashMap<String , String> users = new HashMap<>();
     
     UserService() {
         loadUsers();
@@ -14,9 +14,22 @@ public class UserService {
 
     private void loadUsers() {
         try {
+            Path userfile = Path.of("../../../../../resources/data/users.txt");
 
-        } catch (FileNotFoundException e) {
-            throw new Exception("Error : " + e);
+            List<String> lines = Files.readAllLines(userfile);
+
+            for (String line : lines) {
+                String[] parts = line.split(":", 2);
+
+                if (parts.length == 2) {
+                    String username = parts[0];
+                    String password = parts[1];
+
+                    users.put(username, password);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
         }
     }
 }
