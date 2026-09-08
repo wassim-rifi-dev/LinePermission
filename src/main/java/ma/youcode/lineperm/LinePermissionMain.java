@@ -23,7 +23,7 @@ public class LinePermissionMain {
         new LinePermissionMain(consoleApp , authService , userService);
 
         do {
-            switch (consoleApp.choix) {
+            switch (ConsoleApp.choix) {
                 case "signup":
                     String[] singupInformations = consoleApp.singUpChoix();
 
@@ -40,6 +40,7 @@ public class LinePermissionMain {
                     String loginPassword = loginInformations[1];
 
                     authService.login(loginUsername, loginPassword);
+                    consoleApp.isLoginDesign(loginUsername);
                     break;
 
                 case "exit":
@@ -51,6 +52,6 @@ public class LinePermissionMain {
                     System.out.println("Choix don't existe.");
                     break;
             }
-        } while (consoleApp.choix == "exit");
+        } while (ConsoleApp.choix == "exit");
     }
 }
