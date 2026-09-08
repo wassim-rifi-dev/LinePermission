@@ -31,6 +31,7 @@ public class LinePermissionMain {
                     String signUpPassword = singupInformations[1];
 
                     authService.singUp(signUpUsername, signUpPassword);
+                    consoleApp.isLoginDesign(signUpUsername);
                     break;
 
                 case "login":
@@ -52,6 +53,6 @@ public class LinePermissionMain {
                     System.out.println("Choix don't existe.");
                     break;
             }
-        } while (ConsoleApp.choix == "exit");
+        } while (!ConsoleApp.choix.equals("exit"));
     }
 }

@@ -23,7 +23,7 @@ public class AuthService {
 
             isAuth = true;
 
-            System.out.println(isAuth);
+            System.out.println("");
         } else {
             System.out.println("Username not exeste.");
         }

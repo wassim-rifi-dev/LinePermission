@@ -2,6 +2,8 @@ package ma.youcode.lineperm.ui;
 
 import java.util.Scanner;
 
+import ma.youcode.lineperm.services.AuthService;
+
 public class ConsoleApp {
     public static String choix;
     public static String prompt;
@@ -46,7 +48,9 @@ public class ConsoleApp {
     }
 
     public void isLoginDesign(String username) {
-        System.out.println(username + "@lineperm>");
-        prompt = scanner.nextLine();
+        if (AuthService.isAuth) {
+            System.out.print(username + "@lineperm> ");
+            prompt = scanner.nextLine();
+        }
     }
 }
