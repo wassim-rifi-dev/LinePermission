@@ -2,11 +2,21 @@ package ma.youcode.lineperm.ui;
 
 import java.util.Scanner;
 
+import ma.youcode.lineperm.exceptions.UserAlreadyExisteException;
 import ma.youcode.lineperm.services.AuthService;
+import ma.youcode.lineperm.services.UserService;
 
 public class ConsoleApp {
     public static String choix;
     public static String prompt;
+
+    public final AuthService authService;
+    public final UserService userService;
+
+    public ConsoleApp(AuthService authService , UserService userService) {
+        this.authService = authService;
+        this.userService = userService;
+    }
 
     Scanner scanner = new Scanner(System.in);
 
@@ -43,10 +53,61 @@ public class ConsoleApp {
         return new String[] {username , password};
     }
 
-    public void isLoginDesign() {
-        if (AuthService.isAuth) {
-            System.out.print(AuthService.currentUser + "@lineperm> ");
-            prompt = scanner.nextLine();
+    public boolean notAuthDesign() {
+        userService.loadUsers();
+        start();
+
+        switch (ConsoleApp.choix) {
+            case "signup":
+                try {
+                    String[] singupInformations = singUpChoix();
+
+                    String signUpUsername = singupInformations[0];
+                    String signUpPassword = singupInformations[1];
+
+                    authService.singUp(signUpUsername, signUpPassword);
+                } catch (UserAlreadyExisteException e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
+
+            case "login":
+                try {
+                    String[] loginInformations = loginChoix();
+
+                    String loginUsername = loginInformations[0];
+                    String loginPassword = loginInformations[1];
+
+                    authService.login(loginUsername, loginPassword);
+                } catch (UserAlreadyExisteException e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
+
+            case "exit":
+                System.out.println("Au revoir.");
+                return false;
+
+            
+            default:
+                System.out.println("Choix don't existe.");
+                break;
+        }
+        return true;
+    }
+
+    public void isAuthDesign() {
+        System.out.print(AuthService.currentUser + "@lineperm> ");
+        prompt = scanner.nextLine();
+
+        switch (ConsoleApp.prompt) {
+            case "logout":
+                authService.logout();
+                break;
+        
+            default:
+                System.out.println("Commande note existe");
+                break;
         }
     }
 }
