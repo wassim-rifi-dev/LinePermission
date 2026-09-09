@@ -6,11 +6,15 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 import ma.youcode.lineperm.constants.FilePaths;
+import ma.youcode.lineperm.exceptions.FileAlreadyExisteException;
 
 public class FileService {
 
     public void touch(String fileName) {
         try {
+            if (UserService.files.containsKey(fileName)) {
+                throw new FileAlreadyExisteException("Ce file est existe.");
+            }
             Path filesFile = Path.of(FilePaths.filesFile);
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
 
@@ -19,6 +23,8 @@ public class FileService {
             Files.createFile(filePath);
 
             Files.writeString(filesFile , fileWriting + System.lineSeparator(), StandardOpenOption.APPEND);
+
+            UserService.files.put(fileName, new String[]{AuthService.currentUser , "rwd|---"});
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }

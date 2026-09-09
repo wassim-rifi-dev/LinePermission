@@ -9,6 +9,7 @@ import ma.youcode.lineperm.constants.FilePaths;
 
 public class UserService {
     public static HashMap<String , String> users = new HashMap<>();
+    public static HashMap<String , String[]> files = new HashMap<>();
 
     public UserService() {
         loadUsers();
@@ -16,11 +17,13 @@ public class UserService {
 
     public void loadUsers() {
         try {
-            Path userfile = Path.of(FilePaths.userFile);
+            Path userFile = Path.of(FilePaths.userFile);
+            Path filesFile = Path.of(FilePaths.filesFile);
 
-            List<String> lines = Files.readAllLines(userfile);
+            List<String> userLines = Files.readAllLines(userFile);
+            List<String> fileLines = Files.readAllLines(filesFile);
 
-            for (String line : lines) {
+            for (String line : userLines) {
                 String[] parts = line.split(":", 2);
 
                 if (parts.length == 2) {
@@ -28,6 +31,18 @@ public class UserService {
                     String password = parts[1];
 
                     users.put(username, password);
+                }
+            }
+
+            for (String line : fileLines) {
+                String[] parts = line.split(" ", 3);
+
+                if (parts.length == 3) {
+                    String permission = parts[0];
+                    String owner = parts[1];
+                    String file = parts[2];
+
+                    files.put(file, new String[] {owner , permission});
                 }
             }
         } catch (IOException e) {
