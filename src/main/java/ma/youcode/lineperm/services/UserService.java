@@ -14,7 +14,7 @@ public class UserService {
         loadUsers();
     }
 
-    private void loadUsers() {
+    public void loadUsers() {
         try {
             Path userfile = Path.of(FilePaths.userFile);
 
