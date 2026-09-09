@@ -1,7 +1,8 @@
     package ma.youcode.lineperm;
 
     import ma.youcode.lineperm.services.AuthService;
-    import ma.youcode.lineperm.services.UserService;
+import ma.youcode.lineperm.services.FileService;
+import ma.youcode.lineperm.services.UserService;
     import ma.youcode.lineperm.ui.ConsoleApp;
 
     public class LinePermissionMain {
@@ -18,7 +19,9 @@
         public static void main(String[] args) {
             AuthService authService = new AuthService();
             UserService userService = new UserService();
-            ConsoleApp consoleApp = new ConsoleApp(authService , userService);
+            FileService fileService = new FileService();
+
+            ConsoleApp consoleApp = new ConsoleApp(authService , userService , fileService);
 
             boolean running = true;
 

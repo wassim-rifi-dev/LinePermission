@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import ma.youcode.lineperm.exceptions.UserAlreadyExisteException;
 import ma.youcode.lineperm.services.AuthService;
+import ma.youcode.lineperm.services.FileService;
 import ma.youcode.lineperm.services.UserService;
 
 public class ConsoleApp {
@@ -12,10 +13,12 @@ public class ConsoleApp {
 
     public final AuthService authService;
     public final UserService userService;
+    public final FileService fileService;
 
-    public ConsoleApp(AuthService authService , UserService userService) {
+    public ConsoleApp(AuthService authService , UserService userService , FileService fileService) {
         this.authService = authService;
         this.userService = userService;
+        this.fileService = fileService;
     }
 
     Scanner scanner = new Scanner(System.in);
@@ -100,9 +103,17 @@ public class ConsoleApp {
         System.out.print(AuthService.currentUser + "@lineperm> ");
         prompt = scanner.nextLine();
 
-        switch (ConsoleApp.prompt) {
+        String[] parts = ConsoleApp.prompt.trim().split(" ");
+
+        String p = parts[0];
+
+        switch (p) {
             case "logout":
                 authService.logout();
+                break;
+
+            case "touch":
+                fileService.touch(parts[1]);
                 break;
         
             default:
