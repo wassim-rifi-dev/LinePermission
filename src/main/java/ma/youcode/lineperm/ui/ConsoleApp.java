@@ -9,14 +9,6 @@ public class ConsoleApp {
     public static String prompt;
 
     Scanner scanner = new Scanner(System.in);
-    
-    public ConsoleApp() {
-        if (!AuthService.isAuth && AuthService.currentUser == null) {
-            start();
-        } else {
-            isLoginDesign();
-        }
-    }
 
     public void start() {
         System.out.println("====================== LinePerm ====================");
