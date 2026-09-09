@@ -18,10 +18,8 @@ public class UserService {
     public void loadUsers() {
         try {
             Path userFile = Path.of(FilePaths.userFile);
-            Path filesFile = Path.of(FilePaths.filesFile);
 
             List<String> userLines = Files.readAllLines(userFile);
-            List<String> fileLines = Files.readAllLines(filesFile);
 
             for (String line : userLines) {
                 String[] parts = line.split(":", 2);
@@ -33,6 +31,16 @@ public class UserService {
                     users.put(username, password);
                 }
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public void loadFiles() {
+        try {
+            Path filesFile = Path.of(FilePaths.filesFile);
+
+            List<String> fileLines = Files.readAllLines(filesFile);
 
             for (String line : fileLines) {
                 String[] parts = line.split(" ", 3);
