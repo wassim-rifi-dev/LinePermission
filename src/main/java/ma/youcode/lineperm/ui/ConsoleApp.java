@@ -115,6 +115,7 @@ public class ConsoleApp {
             case "ls":
                 String content = fileService.ls();
                 System.out.println(content);
+                break;
 
             case "touch":
                 fileService.touch(parts[1]);
