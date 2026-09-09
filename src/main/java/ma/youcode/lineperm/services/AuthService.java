@@ -13,6 +13,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class AuthService {
     public static boolean isAuth = false;
+    public static String currentUser = null;
 
     public void login(String username , String password) throws RuntimeException {
         if (UserService.users.containsKey(username)) {
@@ -22,6 +23,7 @@ public class AuthService {
             }
 
             isAuth = true;
+            currentUser = username;
 
             System.out.println("");
         } else {
@@ -44,9 +46,17 @@ public class AuthService {
             UserService.users.put(username, hashedPassword);
 
             Files.writeString(userfile, userWriting + System.lineSeparator() , StandardOpenOption.APPEND);
+
+            isAuth = true;
+            currentUser = username;
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    public void logout() {
+        isAuth = false;
+        currentUser = null;
     }
 
     private String hashPassword(String password) {

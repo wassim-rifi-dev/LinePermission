@@ -31,7 +31,7 @@ public class LinePermissionMain {
                     String signUpPassword = singupInformations[1];
 
                     authService.singUp(signUpUsername, signUpPassword);
-                    consoleApp.isLoginDesign(signUpUsername);
+                    consoleApp.isLoginDesign();
                     break;
 
                 case "login":
@@ -41,7 +41,7 @@ public class LinePermissionMain {
                     String loginPassword = loginInformations[1];
 
                     authService.login(loginUsername, loginPassword);
-                    consoleApp.isLoginDesign(loginUsername);
+                    consoleApp.isLoginDesign();
                     break;
 
                 case "exit":

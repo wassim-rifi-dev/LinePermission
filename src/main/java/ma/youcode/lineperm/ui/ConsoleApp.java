@@ -11,8 +11,10 @@ public class ConsoleApp {
     Scanner scanner = new Scanner(System.in);
     
     public ConsoleApp() {
-        if (!AuthService.isAuth) {
+        if (!AuthService.isAuth && AuthService.currentUser == null) {
             start();
+        } else {
+            isLoginDesign();
         }
     }
 
@@ -49,9 +51,9 @@ public class ConsoleApp {
         return new String[] {username , password};
     }
 
-    public void isLoginDesign(String username) {
+    public void isLoginDesign() {
         if (AuthService.isAuth) {
-            System.out.print(username + "@lineperm> ");
+            System.out.print(AuthService.currentUser + "@lineperm> ");
             prompt = scanner.nextLine();
         }
     }
