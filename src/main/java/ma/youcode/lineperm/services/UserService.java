@@ -13,6 +13,7 @@ public class UserService {
 
     public UserService() {
         loadUsers();
+        loadFiles();
     }
 
     public void loadUsers() {

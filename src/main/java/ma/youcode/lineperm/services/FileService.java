@@ -31,26 +31,41 @@ public class FileService {
         }
     }
 
-    public String ls() {
+    public void ls() {
         try {
             Path filesFile = Path.of(FilePaths.filesFile);
 
             String content = Files.readString(filesFile);
 
-            return content;
+            System.out.println(content);
         }  catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
 
-    public String cat(String fileName) {
+    public void cat(String fileName) {
         try {
-            // Path filesFile = Path.of(FilePaths.filesFile);
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
+
+            if (!Files.exists(filePath)) {
+                System.out.println("Aucune file avec se nom.");
+            }
+
+            String fileOwner = UserService.files.get(fileName)[0];
+            String filePermission = UserService.files.get(fileName)[1];
+
+            if (!fileOwner.equals(AuthService.currentUser)) {
+                String[] permissionPart = filePermission.trim().split("\\|", 2);
+
+                if (!permissionPart[1].contains("r")) {
+                    System.out.println("Vous n'avez pas l'acces.");
+                    return;
+                }
+            }
 
             String content = Files.readString(filePath);
 
-            return content;
+            System.out.println(content);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }

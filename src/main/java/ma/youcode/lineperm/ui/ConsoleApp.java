@@ -107,16 +107,13 @@ public class ConsoleApp {
 
         String p = parts[0];
 
-        String content;
-
         switch (p) {
             case "logout":
                 authService.logout();
                 break;
 
             case "ls":
-                content = fileService.ls();
-                System.out.println(content);
+                fileService.ls();
                 break;
 
             case "touch":
@@ -124,8 +121,7 @@ public class ConsoleApp {
                 break;
 
             case "cat":
-                content = fileService.cat(parts[1]);
-                System.out.println(content);
+                fileService.cat(parts[1]);
                 break;
         
             default:
