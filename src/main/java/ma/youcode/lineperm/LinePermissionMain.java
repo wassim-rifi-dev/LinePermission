@@ -29,43 +29,7 @@
                     userService.loadUsers();
                     consoleApp.start();
 
-                    switch (ConsoleApp.choix) {
-                        case "signup":
-                            try {
-                                String[] singupInformations = consoleApp.singUpChoix();
-
-                                String signUpUsername = singupInformations[0];
-                                String signUpPassword = singupInformations[1];
-
-                                authService.singUp(signUpUsername, signUpPassword);
-                            } catch (UserAlreadyExisteException e) {
-                                System.out.println(e.getMessage());
-                            }
-                            break;
-
-                        case "login":
-                            try {
-                                String[] loginInformations = consoleApp.loginChoix();
-
-                                String loginUsername = loginInformations[0];
-                                String loginPassword = loginInformations[1];
-
-                                authService.login(loginUsername, loginPassword);
-                            } catch (UserAlreadyExisteException e) {
-                                System.out.println(e.getMessage());
-                            }
-                            break;
-
-                        case "exit":
-                            System.out.println("Au revoir.");
-                            running = false;
-                            break;
-
-                        
-                        default:
-                            System.out.println("Choix don't existe.");
-                            break;
-                    }
+                    
                 } else {
                     consoleApp.isLoginDesign();
 
