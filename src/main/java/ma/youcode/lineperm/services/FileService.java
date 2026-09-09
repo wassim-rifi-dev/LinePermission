@@ -23,4 +23,16 @@ public class FileService {
             throw new RuntimeException(e.getMessage());
         }
     }
+
+    public String ls() {
+        try {
+            Path filesFile = Path.of(FilePaths.filesFile);
+
+            String content = Files.readString(filesFile);
+
+            return content;
+        }  catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
 }
