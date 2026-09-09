@@ -15,6 +15,7 @@ public class FileService {
             if (UserService.files.containsKey(fileName)) {
                 throw new FileAlreadyExisteException("Ce file est existe.");
             }
+
             Path filesFile = Path.of(FilePaths.filesFile);
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
 
@@ -38,6 +39,19 @@ public class FileService {
 
             return content;
         }  catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public String cat(String fileName) {
+        try {
+            // Path filesFile = Path.of(FilePaths.filesFile);
+            Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
+
+            String content = Files.readString(filePath);
+
+            return content;
+        } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
