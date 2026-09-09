@@ -1,6 +1,5 @@
     package ma.youcode.lineperm;
 
-    import ma.youcode.lineperm.exceptions.UserAlreadyExisteException;
     import ma.youcode.lineperm.services.AuthService;
     import ma.youcode.lineperm.services.UserService;
     import ma.youcode.lineperm.ui.ConsoleApp;
@@ -17,31 +16,18 @@
         }
 
         public static void main(String[] args) {
-            ConsoleApp consoleApp = new ConsoleApp();
             AuthService authService = new AuthService();
             UserService userService = new UserService();
+            ConsoleApp consoleApp = new ConsoleApp(authService , userService);
 
             boolean running = true;
 
             while (running) {
 
                 if (!AuthService.isAuth) {
-                    userService.loadUsers();
-                    consoleApp.start();
-
-                    
+                    running = consoleApp.notAuthDesign();
                 } else {
-                    consoleApp.isLoginDesign();
-
-                    switch (ConsoleApp.prompt) {
-                        case "logout":
-                            authService.logout();
-                            break;
-                    
-                        default:
-                            System.out.println("Commande note existe");
-                            break;
-                    }
+                    consoleApp.isAuthDesign();
                 }
             }
         }

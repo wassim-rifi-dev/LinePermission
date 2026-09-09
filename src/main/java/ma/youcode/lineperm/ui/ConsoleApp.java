@@ -4,10 +4,19 @@ import java.util.Scanner;
 
 import ma.youcode.lineperm.exceptions.UserAlreadyExisteException;
 import ma.youcode.lineperm.services.AuthService;
+import ma.youcode.lineperm.services.UserService;
 
 public class ConsoleApp {
     public static String choix;
     public static String prompt;
+
+    public final AuthService authService;
+    public final UserService userService;
+
+    public ConsoleApp(AuthService authService , UserService userService) {
+        this.authService = authService;
+        this.userService = userService;
+    }
 
     Scanner scanner = new Scanner(System.in);
 
@@ -44,14 +53,10 @@ public class ConsoleApp {
         return new String[] {username , password};
     }
 
-    public void isLoginDesign() {
-        if (AuthService.isAuth) {
-            System.out.print(AuthService.currentUser + "@lineperm> ");
-            prompt = scanner.nextLine();
-        }
-    }
+    public boolean notAuthDesign() {
+        userService.loadUsers();
+        start();
 
-    public void notAuthDesign(boolean running) {
         switch (ConsoleApp.choix) {
             case "signup":
                 try {
@@ -81,12 +86,27 @@ public class ConsoleApp {
 
             case "exit":
                 System.out.println("Au revoir.");
-                running = false;
-                break;
+                return false;
 
             
             default:
                 System.out.println("Choix don't existe.");
+                break;
+        }
+        return true;
+    }
+
+    public void isAuthDesign() {
+        System.out.print(AuthService.currentUser + "@lineperm> ");
+        prompt = scanner.nextLine();
+
+        switch (ConsoleApp.prompt) {
+            case "logout":
+                authService.logout();
+                break;
+        
+            default:
+                System.out.println("Commande note existe");
                 break;
         }
     }
