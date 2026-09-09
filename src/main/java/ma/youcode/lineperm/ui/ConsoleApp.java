@@ -2,15 +2,13 @@ package ma.youcode.lineperm.ui;
 
 import java.util.Scanner;
 
+import ma.youcode.lineperm.services.AuthService;
+
 public class ConsoleApp {
     public static String choix;
     public static String prompt;
 
     Scanner scanner = new Scanner(System.in);
-    
-    public ConsoleApp() {
-        start();
-    }
 
     public void start() {
         System.out.println("====================== LinePerm ====================");
@@ -45,8 +43,10 @@ public class ConsoleApp {
         return new String[] {username , password};
     }
 
-    public void isLoginDesign(String username) {
-        System.out.println(username + "@lineperm>");
-        prompt = scanner.nextLine();
+    public void isLoginDesign() {
+        if (AuthService.isAuth) {
+            System.out.print(AuthService.currentUser + "@lineperm> ");
+            prompt = scanner.nextLine();
+        }
     }
 }
