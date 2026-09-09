@@ -16,9 +16,9 @@ public class FileService {
 
             String fileWriting = "rwd|--- " + AuthService.currentUser + " " + fileName;
 
-            Files.writeString(filesFile , fileWriting + System.lineSeparator() + StandardOpenOption.APPEND);
-
             Files.createFile(filePath);
+
+            Files.writeString(filesFile , fileWriting + System.lineSeparator(), StandardOpenOption.APPEND);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
