@@ -16,10 +16,22 @@ public class FileService {
 
             String fileWriting = "rwd|--- " + AuthService.currentUser + " " + fileName;
 
-            Files.writeString(filesFile , fileWriting + System.lineSeparator() + StandardOpenOption.APPEND);
-
             Files.createFile(filePath);
+
+            Files.writeString(filesFile , fileWriting + System.lineSeparator(), StandardOpenOption.APPEND);
         } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public String ls() {
+        try {
+            Path filesFile = Path.of(FilePaths.filesFile);
+
+            String content = Files.readString(filesFile);
+
+            return content;
+        }  catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
     }

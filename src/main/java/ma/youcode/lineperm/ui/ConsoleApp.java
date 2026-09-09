@@ -112,6 +112,10 @@ public class ConsoleApp {
                 authService.logout();
                 break;
 
+            case "ls":
+                String content = fileService.ls();
+                System.out.println(content);
+
             case "touch":
                 fileService.touch(parts[1]);
                 break;
