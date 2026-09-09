@@ -11,7 +11,9 @@ public class ConsoleApp {
     Scanner scanner = new Scanner(System.in);
     
     public ConsoleApp() {
-        start();
+        if (!AuthService.isAuth) {
+            start();
+        }
     }
 
     public void start() {
