@@ -1,5 +1,6 @@
 package ma.youcode.lineperm;
 
+import ma.youcode.lineperm.exceptions.UserAlreadyExisteException;
 import ma.youcode.lineperm.services.AuthService;
 import ma.youcode.lineperm.services.UserService;
 import ma.youcode.lineperm.ui.ConsoleApp;
@@ -25,23 +26,31 @@ public class LinePermissionMain {
         do {
             switch (ConsoleApp.choix) {
                 case "signup":
-                    String[] singupInformations = consoleApp.singUpChoix();
+                    try {
+                        String[] singupInformations = consoleApp.singUpChoix();
 
-                    String signUpUsername = singupInformations[0];
-                    String signUpPassword = singupInformations[1];
+                        String signUpUsername = singupInformations[0];
+                        String signUpPassword = singupInformations[1];
 
-                    authService.singUp(signUpUsername, signUpPassword);
-                    consoleApp.isLoginDesign();
+                        authService.singUp(signUpUsername, signUpPassword);
+                        consoleApp.isLoginDesign();
+                    } catch (UserAlreadyExisteException e) {
+                        System.out.println(e.getMessage());
+                    }
                     break;
 
                 case "login":
-                    String[] loginInformations = consoleApp.singUpChoix();
+                    try {
+                        String[] loginInformations = consoleApp.singUpChoix();
 
-                    String loginUsername = loginInformations[0];
-                    String loginPassword = loginInformations[1];
+                        String loginUsername = loginInformations[0];
+                        String loginPassword = loginInformations[1];
 
-                    authService.login(loginUsername, loginPassword);
-                    consoleApp.isLoginDesign();
+                        authService.login(loginUsername, loginPassword);
+                        consoleApp.isLoginDesign();
+                    } catch (UserAlreadyExisteException e) {
+                        System.out.println(e.getMessage());
+                    }
                     break;
 
                 case "exit":
