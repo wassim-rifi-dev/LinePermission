@@ -123,6 +123,10 @@ public class ConsoleApp {
             case "cat":
                 fileService.cat(parts[1]);
                 break;
+
+            case "nano":
+                fileService.nano(parts[1]);
+                break;
         
             default:
                 System.out.println("Commande note existe");
