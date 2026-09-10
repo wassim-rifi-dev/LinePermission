@@ -137,14 +137,20 @@ public class FileService {
 
             for (int i = 0 ; i < fileLines.size() ; i++) {
                 if (fileLines.get(i).contains(fileName) && fileLines.get(i).contains(fileOwner)) {
-                    String newOtherPer = "---";
+                    String[] parts = fileLines.get(i).trim().split(" ");
 
-                    if (per.equals("r")) {
-                        newOtherPer = "r--";
-                    } else if (per.equals("w")) {
-                        newOtherPer = "-w-";
-                    } else if (per.equals("d")) {
-                        newOtherPer = "--d";
+                    String[] perPart = parts[0].trim().split("\\|");
+
+                    String newOtherPer = perPart[1];
+
+                    for (char permission : per.toCharArray()) {
+                        if (permission == 'r') {
+                            newOtherPer = "r" + newOtherPer.substring(1);
+                        } else if (permission == 'w') {
+                            newOtherPer = newOtherPer.substring(0 , 1)  + "w" + newOtherPer.substring(2);
+                        } else if (permission == 'd') {
+                            newOtherPer = newOtherPer.substring(0 , 2) + "d";
+                        }
                     }
 
                     String newLine = "rwd|" + newOtherPer + " " + fileOwner + " " + fileName;
