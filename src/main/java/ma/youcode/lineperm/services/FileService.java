@@ -12,6 +12,12 @@ import ma.youcode.lineperm.exceptions.FileAlreadyExisteException;
 
 public class FileService {
 
+    private final Scanner scanner;
+
+    public FileService(Scanner scanner) {
+        this.scanner = scanner;
+    }
+
     public void touch(String fileName) {
         try {
             if (UserService.files.containsKey(fileName)) {
@@ -98,7 +104,6 @@ public class FileService {
             String content = Files.readString(filePath);
             System.out.print(content);
 
-            Scanner scanner = new Scanner(System.in);
             String newContent;
 
             do {
@@ -108,8 +113,6 @@ public class FileService {
                     Files.writeString(filePath, newContent + System.lineSeparator() , StandardOpenOption.APPEND);
                 }
             } while (!newContent.trim().split(" ")[0].equals("EOF"));
-
-            scanner.close();
 
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
