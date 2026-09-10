@@ -155,6 +155,7 @@ public class FileService {
 
                     String newLine = "rwd|" + newOtherPer + " " + fileOwner + " " + fileName;
 
+                    UserService.files.put(fileName, new String[]{fileOwner , "rwd|" + newOtherPer});
                     fileLines.set(i, newLine);
                     Files.write(filesFile, fileLines);
                     break;
