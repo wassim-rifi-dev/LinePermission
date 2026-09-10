@@ -6,9 +6,10 @@ import java.nio.file.Path;
 import java.util.*;
 
 import ma.youcode.lineperm.constants.FilePaths;
+import ma.youcode.lineperm.models.User;
 
 public class UserService {
-    public static HashMap<String , String> users = new HashMap<>();
+    public static HashMap<String , User> users = new HashMap<>();
     public static HashMap<String , String[]> files = new HashMap<>();
 
     public UserService() {
@@ -29,7 +30,9 @@ public class UserService {
                     String username = parts[0];
                     String password = parts[1];
 
-                    users.put(username, password);
+                    User newUser = new User(username , password);
+
+                    users.put(username, newUser);
                 }
             }
         } catch (IOException e) {
