@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 import ma.youcode.lineperm.constants.FilePaths;
 import ma.youcode.lineperm.exceptions.FileAlreadyExisteException;
+import ma.youcode.lineperm.models.FichierProtege;
 
 public class FileService {
 
@@ -33,7 +34,9 @@ public class FileService {
 
             Files.writeString(filesFile , fileWriting + System.lineSeparator(), StandardOpenOption.APPEND);
 
-            UserService.files.put(fileName, new String[]{AuthService.currentUser , "rwd|---"});
+            FichierProtege fichierProtege = new FichierProtege("rwd|---", AuthService.currentUser, fileName);
+
+            UserService.files.put(fileName, fichierProtege);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -59,8 +62,8 @@ public class FileService {
                 System.out.println("Aucune file avec se nom.");
             }
 
-            String fileOwner = UserService.files.get(fileName)[0];
-            String filePermission = UserService.files.get(fileName)[1];
+            String fileOwner = UserService.files.get(fileName).getOwner();
+            String filePermission = UserService.files.get(fileName).getPermissions();
 
             if (!fileOwner.equals(AuthService.currentUser)) {
                 String[] permissionPart = filePermission.trim().split("\\|", 2);
@@ -87,8 +90,8 @@ public class FileService {
                 System.out.println("Aucune file avec se nom.");
             }
             
-            String fileOwner = UserService.files.get(fileName)[0];
-            String filePermission = UserService.files.get(fileName)[1];
+            String fileOwner = UserService.files.get(fileName).getOwner();
+            String filePermission = UserService.files.get(fileName).getPermissions();
             
             if (!fileOwner.equals(AuthService.currentUser)) {
                 String[] permissionPart = filePermission.trim().split("\\|", 2);
@@ -127,7 +130,7 @@ public class FileService {
                 System.out.println("Aucune file avec se nom.");
             }
 
-            String fileOwner = UserService.files.get(fileName)[0];
+            String fileOwner = UserService.files.get(fileName).getOwner();
 
             if (!fileOwner.equals(AuthService.currentUser)) {
                 System.out.println("Vous n'avez pas l'acces.");
@@ -169,7 +172,9 @@ public class FileService {
 
                 String newLine = "rwd|" + newOtherPer + " " + fileOwner + " " + fileName;
 
-                UserService.files.put(fileName, new String[]{fileOwner , "rwd|" + newOtherPer});
+                FichierProtege fichierProtege = new FichierProtege("rwd|" + newOtherPer , fileOwner, fileName);
+
+                UserService.files.put(fileName, fichierProtege);
                 fileLines.set(i, newLine);
                 Files.write(filesFile, fileLines);
                 break;
@@ -198,7 +203,9 @@ public class FileService {
 
                 String newLine = "rwd|" + newOtherPer + " " + fileOwner + " " + fileName;
 
-                UserService.files.put(fileName, new String[]{fileOwner , "rwd|" + newOtherPer});
+                FichierProtege fichierProtege = new FichierProtege("rwd|" + newOtherPer , fileOwner, fileName);
+
+                UserService.files.put(fileName, fichierProtege);
                 fileLines.set(i, newLine);
                 Files.write(filesFile, fileLines);
                 break;

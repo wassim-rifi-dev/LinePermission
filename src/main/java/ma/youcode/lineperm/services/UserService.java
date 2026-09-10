@@ -6,11 +6,12 @@ import java.nio.file.Path;
 import java.util.*;
 
 import ma.youcode.lineperm.constants.FilePaths;
+import ma.youcode.lineperm.models.FichierProtege;
 import ma.youcode.lineperm.models.User;
 
 public class UserService {
     public static HashMap<String , User> users = new HashMap<>();
-    public static HashMap<String , String[]> files = new HashMap<>();
+    public static HashMap<String , FichierProtege> files = new HashMap<>();
 
     public UserService() {
         loadUsers();
@@ -54,7 +55,9 @@ public class UserService {
                     String owner = parts[1];
                     String file = parts[2];
 
-                    files.put(file, new String[] {owner , permission});
+                    FichierProtege fichierProtege = new FichierProtege(permission, owner, file);
+
+                    files.put(file, fichierProtege);
                 }
             }
         } catch (IOException e) {
