@@ -127,6 +127,10 @@ public class ConsoleApp {
             case "nano":
                 fileService.nano(parts[1]);
                 break;
+
+            case "chmod":
+                fileService.chmod(parts[2] , parts[1]);
+                break;
         
             default:
                 System.out.println("Commande note existe");

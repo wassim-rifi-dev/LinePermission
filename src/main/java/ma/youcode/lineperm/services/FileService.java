@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 import java.util.Scanner;
 
 import ma.youcode.lineperm.constants.FilePaths;
@@ -74,20 +75,18 @@ public class FileService {
 
     public void nano(String fileName) {
         try {
-            Scanner scanner = new Scanner(System.in);
-
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
-
+            
             if (!Files.exists(filePath)) {
                 System.out.println("Aucune file avec se nom.");
             }
-
+            
             String fileOwner = UserService.files.get(fileName)[0];
             String filePermission = UserService.files.get(fileName)[1];
-
+            
             if (!fileOwner.equals(AuthService.currentUser)) {
                 String[] permissionPart = filePermission.trim().split("\\|", 2);
-
+                
                 if (!permissionPart[1].contains("w")) {
                     System.out.println("Vous n'avez pas l'acces.");
                     return;
@@ -99,6 +98,7 @@ public class FileService {
             String content = Files.readString(filePath);
             System.out.print(content);
 
+            Scanner scanner = new Scanner(System.in);
             String newContent;
 
             do {
@@ -109,6 +109,51 @@ public class FileService {
                 }
             } while (!newContent.trim().split(" ")[0].equals("EOF"));
 
+            scanner.close();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public void chmod(String fileName , String per) {
+        try {
+            Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
+
+            if (!Files.exists(filePath)) {
+                System.out.println("Aucune file avec se nom.");
+            }
+
+            String fileOwner = UserService.files.get(fileName)[0];
+
+            if (!fileOwner.equals(AuthService.currentUser)) {
+                System.out.println("Vous n'avez pas l'acces.");
+                return;
+            }
+
+            Path filesFile = Path.of(FilePaths.filesFile);
+
+            List<String> fileLines = Files.readAllLines(filesFile);
+
+            for (int i = 0 ; i < fileLines.size() ; i++) {
+                if (fileLines.get(i).contains(fileName) && fileLines.get(i).contains(fileOwner)) {
+                    String newOtherPer = "---";
+
+                    if (per.equals("r")) {
+                        newOtherPer = "r--";
+                    } else if (per.equals("w")) {
+                        newOtherPer = "-w-";
+                    } else if (per.equals("d")) {
+                        newOtherPer = "--d";
+                    }
+
+                    String newLine = "rwd|" + newOtherPer + " " + fileOwner + " " + fileName;
+
+                    fileLines.set(i, newLine);
+                    Files.write(filesFile, fileLines);
+                    break;
+                }
+            }
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
