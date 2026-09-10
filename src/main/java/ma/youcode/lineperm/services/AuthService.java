@@ -3,6 +3,7 @@ package ma.youcode.lineperm.services;
 import ma.youcode.lineperm.constants.FilePaths;
 import ma.youcode.lineperm.exceptions.InvalidPasswordException;
 import ma.youcode.lineperm.exceptions.UserAlreadyExisteException;
+import ma.youcode.lineperm.models.User;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,7 +19,7 @@ public class AuthService {
     public void login(String username , String password) throws RuntimeException {
         if (UserService.users.containsKey(username)) {
 
-            if (!BCrypt.checkpw(password, UserService.users.get(username))) {
+            if (!BCrypt.checkpw(password, UserService.users.get(username).getPassword())) {
                 throw new InvalidPasswordException("Password is incorect.");
             }
 
@@ -43,7 +44,9 @@ public class AuthService {
 
             String userWriting = username + ":" + hashedPassword;
 
-            UserService.users.put(username, hashedPassword);
+            User newUser = new User(username, hashedPassword);
+
+            UserService.users.put(username, newUser);
 
             Files.writeString(userfile, userWriting + System.lineSeparator() , StandardOpenOption.APPEND);
 
