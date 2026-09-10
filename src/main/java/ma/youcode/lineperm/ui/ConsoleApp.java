@@ -113,11 +113,23 @@ public class ConsoleApp {
                 break;
 
             case "ls":
-                String content = fileService.ls();
-                System.out.println(content);
+                fileService.ls();
+                break;
 
             case "touch":
                 fileService.touch(parts[1]);
+                break;
+
+            case "cat":
+                fileService.cat(parts[1]);
+                break;
+
+            case "nano":
+                fileService.nano(parts[1]);
+                break;
+
+            case "chmod":
+                fileService.chmod(parts[2] , parts[1]);
                 break;
         
             default:
