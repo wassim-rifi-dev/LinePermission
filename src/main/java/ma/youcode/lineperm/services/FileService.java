@@ -138,32 +138,63 @@ public class FileService {
 
             List<String> fileLines = Files.readAllLines(filesFile);
 
-            for (int i = 0 ; i < fileLines.size() ; i++) {
-                if (fileLines.get(i).contains(fileName) && fileLines.get(i).contains(fileOwner)) {
-                    String[] parts = fileLines.get(i).trim().split(" ");
+            if (!per.startsWith("-")) {
+                for (int i = 0 ; i < fileLines.size() ; i++) {
+                    if (fileLines.get(i).contains(fileName) && fileLines.get(i).contains(fileOwner)) {
+                        String[] parts = fileLines.get(i).trim().split(" ");
 
-                    String[] perPart = parts[0].trim().split("\\|");
+                        String[] perPart = parts[0].trim().split("\\|");
 
-                    String newOtherPer = perPart[1];
+                        String newOtherPer = perPart[1];
 
-                    for (char permission : per.toCharArray()) {
-                        if (permission == 'r') {
-                            newOtherPer = "r" + newOtherPer.substring(1);
-                        } else if (permission == 'w') {
-                            newOtherPer = newOtherPer.substring(0 , 1)  + "w" + newOtherPer.substring(2);
-                        } else if (permission == 'd') {
-                            newOtherPer = newOtherPer.substring(0 , 2) + "d";
+                        for (char permission : per.toCharArray()) {
+                            if (permission == 'r') {
+                                newOtherPer = "r" + newOtherPer.substring(1);
+                            } else if (permission == 'w') {
+                                newOtherPer = "rw" + newOtherPer.substring(2);
+                            } else if (permission == 'd') {
+                                newOtherPer = "rwd";
+                            }
                         }
+
+                        String newLine = "rwd|" + newOtherPer + " " + fileOwner + " " + fileName;
+
+                        UserService.files.put(fileName, new String[]{fileOwner , "rwd|" + newOtherPer});
+                        fileLines.set(i, newLine);
+                        Files.write(filesFile, fileLines);
+                        break;
                     }
+                }
+            } else {
+                for (int i = 0; i < fileLines.size(); i++) {
+                    if (fileLines.get(i).contains(fileName) && fileLines.get(i).contains(fileOwner)) {
+                        String[] parts = fileLines.get(i).trim().split(" ");
 
-                    String newLine = "rwd|" + newOtherPer + " " + fileOwner + " " + fileName;
+                        String[] perPart = parts[0].trim().split("\\|");
 
-                    UserService.files.put(fileName, new String[]{fileOwner , "rwd|" + newOtherPer});
-                    fileLines.set(i, newLine);
-                    Files.write(filesFile, fileLines);
-                    break;
+                        String newOtherPer = perPart[1];
+
+                        for (char permission : per.toCharArray()) {
+                            if (permission == 'r') {
+                                newOtherPer = "---";
+                            } else if (permission == 'w') {
+                                newOtherPer = newOtherPer.substring(0 , 1)  + "--";
+                            } else if (permission == 'd') {
+                                newOtherPer = newOtherPer.substring(0 , 2) + "-";
+                            }
+                        }
+
+                        String newLine = "rwd|" + newOtherPer + " " + fileOwner + " " + fileName;
+
+                        UserService.files.put(fileName, new String[]{fileOwner , "rwd|" + newOtherPer});
+                        fileLines.set(i, newLine);
+                        Files.write(filesFile, fileLines);
+                        break;
+                    }
                 }
             }
+
+            
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
