@@ -1,11 +1,11 @@
-    package ma.youcode.lineperm;
+package ma.youcode.lineperm;
 
-    import java.util.Scanner;
-    
-    import ma.youcode.lineperm.services.AuthService;
+import java.util.Scanner;
+
+import ma.youcode.lineperm.services.AuthService;
 import ma.youcode.lineperm.services.FileService;
 import ma.youcode.lineperm.services.UserService;
-    import ma.youcode.lineperm.ui.ConsoleApp;
+import ma.youcode.lineperm.ui.ConsoleApp;
 
     public class LinePermissionMain {
         private final ConsoleApp consoleApp;
