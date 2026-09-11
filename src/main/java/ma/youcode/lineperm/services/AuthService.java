@@ -1,8 +1,6 @@
 package ma.youcode.lineperm.services;
 
 import ma.youcode.lineperm.constants.FilePaths;
-import ma.youcode.lineperm.exceptions.InvalidPasswordException;
-import ma.youcode.lineperm.exceptions.UserAlreadyExisteException;
 import ma.youcode.lineperm.models.User;
 
 import java.io.IOException;
