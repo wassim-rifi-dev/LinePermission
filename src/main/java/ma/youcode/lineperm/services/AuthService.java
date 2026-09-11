@@ -20,7 +20,8 @@ public class AuthService {
         if (UserService.users.containsKey(username)) {
 
             if (!BCrypt.checkpw(password, UserService.users.get(username).getPassword())) {
-                throw new InvalidPasswordException("Password is incorect.");
+                System.err.println("Password is incorect.\n");
+                return;
             }
 
             isAuth = true;
