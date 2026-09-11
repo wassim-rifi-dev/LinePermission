@@ -35,7 +35,8 @@ public class AuthService {
 
     public void singUp(String username , String password) throws RuntimeException {
         if (UserService.users.containsKey(username)) {
-            throw new UserAlreadyExisteException("Ce username est existe.");
+            System.err.println("Ce username est existe.");
+            return;
         }
 
         try {
