@@ -20,7 +20,8 @@ public class AuthService {
         if (UserService.users.containsKey(username)) {
 
             if (!BCrypt.checkpw(password, UserService.users.get(username).getPassword())) {
-                throw new InvalidPasswordException("Password is incorect.");
+                System.err.println("Password is incorect.\n");
+                return;
             }
 
             isAuth = true;
@@ -34,7 +35,8 @@ public class AuthService {
 
     public void singUp(String username , String password) throws RuntimeException {
         if (UserService.users.containsKey(username)) {
-            throw new UserAlreadyExisteException("Ce username est existe.");
+            System.err.println("Ce username est existe.");
+            return;
         }
 
         try {

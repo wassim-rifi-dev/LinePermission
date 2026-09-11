@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import ma.youcode.lineperm.constants.FilePaths;
-import ma.youcode.lineperm.exceptions.FileAlreadyExisteException;
 import ma.youcode.lineperm.models.FichierProtege;
 
 public class FileService {
@@ -22,7 +21,8 @@ public class FileService {
     public void touch(String fileName) {
         try {
             if (UserService.files.containsKey(fileName)) {
-                throw new FileAlreadyExisteException("Ce file est existe.");
+                System.out.println("Ce file est existe.");
+                return;
             }
 
             Path filesFile = Path.of(FilePaths.filesFile);
@@ -58,8 +58,9 @@ public class FileService {
         try {
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
 
-            if (!Files.exists(filePath)) {
-                System.out.println("Aucune file avec se nom.");
+            if (UserService.files.containsKey(fileName)) {
+                System.out.println("Ce file est existe.");
+                return;
             }
 
             String fileOwner = UserService.files.get(fileName).getOwner();
@@ -86,8 +87,9 @@ public class FileService {
         try {
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
             
-            if (!Files.exists(filePath)) {
-                System.out.println("Aucune file avec se nom.");
+            if (UserService.files.containsKey(fileName)) {
+                System.out.println("Ce file est existe.");
+                return;
             }
             
             String fileOwner = UserService.files.get(fileName).getOwner();
@@ -124,10 +126,9 @@ public class FileService {
 
     public void chmod(String fileName , String per) {
         try {
-            Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
-
-            if (!Files.exists(filePath)) {
-                System.out.println("Aucune file avec se nom.");
+            if (UserService.files.containsKey(fileName)) {
+                System.out.println("Ce file est existe.");
+                return;
             }
 
             String fileOwner = UserService.files.get(fileName).getOwner();
