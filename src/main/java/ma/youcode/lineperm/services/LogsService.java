@@ -1,7 +1,10 @@
 package ma.youcode.lineperm.services;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import ma.youcode.lineperm.models.AccessLog;
 import ma.youcode.lineperm.models.enums.LogResult;
 
 public class LogsService {
@@ -33,5 +36,23 @@ public class LogsService {
 
         System.out.print("Utilisateurs distincts : ");
         users.stream().forEach(System.out::println);
+    }
+
+    public void logsNumberByUser() {
+        Map<String, Long> logsNumberByUser = UserService.logs.stream()
+                                                            .collect(Collectors.groupingBy(
+                                                                AccessLog::getUser,
+                                                                Collectors.counting()
+                                                            ));
+
+        if (logsNumberByUser.isEmpty()) {
+            System.out.println("Aucune utilisateurs a des activites.");
+            return;
+        }
+
+        System.out.println("Numero de logs a chaque utilisateur : ");
+        logsNumberByUser.entrySet().stream()
+                        .forEach(user -> System.out.print(user.getKey() + " : " + user.getValue()));
+        System.out.println("");
     }
 }

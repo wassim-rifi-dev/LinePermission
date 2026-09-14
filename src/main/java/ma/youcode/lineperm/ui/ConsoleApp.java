@@ -180,6 +180,10 @@ public class ConsoleApp {
                     logsService.distinctUsers();
                     break;
 
+                case 4 :
+                    logsService.logsNumberByUser();
+                    break;
+
                 default:
                     System.out.println("Commande note existe");
                     break;
