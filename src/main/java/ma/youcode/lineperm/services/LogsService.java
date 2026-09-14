@@ -95,4 +95,19 @@ public class LogsService {
 
         System.out.println("Nombre refuse d'actions pour " + user + " : " + refusedLogUser);
     }
+
+    public void actifUser() {
+        String user = UserService.logs.stream()
+                                .collect(Collectors.groupingBy(
+                                    AccessLog::getUser, 
+                                    Collectors.counting()
+                                ))
+                                .entrySet()
+                                .stream()
+                                .max(Map.Entry.comparingByValue())
+                                .map(Map.Entry::getKey)
+                                .toString();
+
+        System.out.println("L'utilisateur le plus actif est : " + user);
+    }
 }

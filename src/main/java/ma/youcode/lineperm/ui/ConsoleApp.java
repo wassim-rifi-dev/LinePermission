@@ -192,6 +192,10 @@ public class ConsoleApp {
                     logsService.userLogRefused();
                     break;
 
+                case 7:
+                    logsService.actifUser();
+                    break;
+
                 default:
                     System.out.println("Commande note existe");
                     break;
