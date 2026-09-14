@@ -17,7 +17,7 @@ import ma.youcode.lineperm.models.enums.LogType;
 public class UserService {
     public static HashMap<String , User> users = new HashMap<>();
     public static HashMap<String , FichierProtege> files = new HashMap<>();
-    public static HashMap<String , AccessLog> logs = new HashMap<>();
+    public static List<AccessLog> logs = new ArrayList<>();
 
     public UserService() {
         loadUsers();
@@ -90,7 +90,7 @@ public class UserService {
                                 String file = parts[4];
                                 LogResult result = LogResult.valueOf(parts[5]);
 
-                                logs.put(user, new AccessLog(date, time, user, type, file, result));
+                                logs.add(new AccessLog(date, time, user, type, file, result));
                             }
                         });
         } catch (IOException e) {

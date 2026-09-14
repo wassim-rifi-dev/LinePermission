@@ -46,7 +46,7 @@ public class FileService {
             AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.CREATION, fileName, LogResult.OK);
 
             UserService.files.put(fileName, fichierProtege);
-            UserService.logs.put(AuthService.currentUser, log);
+            UserService.logs.add(log);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -85,7 +85,7 @@ public class FileService {
                     Files.writeString(logsFile, logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
 
                     AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.LECTURE, fileName, LogResult.REFUSE);
-                    UserService.logs.put(AuthService.currentUser, log);
+                    UserService.logs.add(log);
 
                     System.out.println("Vous n'avez pas l'acces.");
                     return;
@@ -98,7 +98,7 @@ public class FileService {
             Files.writeString(logsFile, logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
 
             AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.LECTURE, fileName, LogResult.OK);
-            UserService.logs.put(AuthService.currentUser, log);
+            UserService.logs.add(log);
 
             System.out.println(content);
         } catch (IOException e) {
@@ -127,7 +127,7 @@ public class FileService {
                     Files.writeString(logsFile, logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
 
                     AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.ECRITURE, fileName, LogResult.REFUSE);
-                    UserService.logs.put(AuthService.currentUser, log);
+                    UserService.logs.add(log);
 
                     System.out.println("Vous n'avez pas l'acces.");
                     return;
@@ -153,7 +153,7 @@ public class FileService {
             Files.writeString(logsFile, logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
 
             AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.ECRITURE, fileName, LogResult.OK);
-            UserService.logs.put(AuthService.currentUser, log);
+            UserService.logs.add(log);
 
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
