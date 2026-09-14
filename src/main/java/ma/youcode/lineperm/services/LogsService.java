@@ -60,8 +60,8 @@ public class LogsService {
 
         System.out.println("Numero de logs a chaque utilisateur : ");
         logsNumberByUser.entrySet().stream()
-                        .forEach(user -> System.out.print(user.getKey() + " : " + user.getValue()));
-        System.out.println("");
+                        .forEach(user -> System.out.println("   - " + user.getKey() + " : " + user.getValue()));
+        System.out.println();
     }
 
     public void topThreeFile() {
