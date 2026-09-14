@@ -196,6 +196,10 @@ public class ConsoleApp {
                     logsService.actifUser();
                     break;
 
+                case 8:
+                    logsService.actionByType();
+                    break;
+
                 default:
                     System.out.println("Commande note existe");
                     break;

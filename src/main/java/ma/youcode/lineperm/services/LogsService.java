@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import ma.youcode.lineperm.models.AccessLog;
 import ma.youcode.lineperm.models.enums.LogResult;
+import ma.youcode.lineperm.models.enums.LogType;
 
 public class LogsService {
 
@@ -109,5 +110,13 @@ public class LogsService {
                                 .toString();
 
         System.out.println("L'utilisateur le plus actif est : " + user);
+    }
+
+    public void actionByType() {
+        UserService.logs.stream()
+                    .collect(Collectors.groupingBy(AccessLog::getType , Collectors.counting()))
+                    .entrySet()
+                    .stream()
+                    .forEach(log -> System.out.println(log.getKey() + " : " + log.getValue()));
     }
 }
