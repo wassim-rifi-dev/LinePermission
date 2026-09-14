@@ -25,13 +25,21 @@ public class FileService {
 
     public void touch(String fileName) {
         try {
+            Path logsFile = Path.of(FilePaths.LOGS_FILE);
+
             if (UserService.files.containsKey(fileName)) {
                 System.out.println("Ce file est existe.");
+
+                String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + AuthService.currentUser + ";" + LogType.CREATION + ";" + fileName + ";" + LogResult.REFUSE;
+                Files.writeString(logsFile , logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
+
+                AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.CREATION, fileName, LogResult.REFUSE);
+                UserService.logs.add(log);
+
                 return;
             }
 
             Path filesFile = Path.of(FilePaths.filesFile);
-            Path logsFile = Path.of(FilePaths.LOGS_FILE);
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
 
             String fileWriting = "rwd|--- " + AuthService.currentUser + " " + fileName;
@@ -71,6 +79,12 @@ public class FileService {
 
             if (!UserService.files.containsKey(fileName)) {
                 System.out.println("Ce file n'existe pas.");
+                String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + AuthService.currentUser + ";" + LogType.LECTURE + ";" + fileName + ";" + LogResult.REFUSE;
+                Files.writeString(logsFile , logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
+
+                AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.LECTURE, fileName, LogResult.REFUSE);
+                UserService.logs.add(log);
+
                 return;
             }
 
@@ -113,6 +127,12 @@ public class FileService {
 
             if (!UserService.files.containsKey(fileName)) {
                 System.out.println("Ce file n'existe pas.");
+                String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + AuthService.currentUser + ";" + LogType.ECRITURE + ";" + fileName + ";" + LogResult.REFUSE;
+                Files.writeString(logsFile , logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
+
+                AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.ECRITURE, fileName, LogResult.REFUSE);
+                UserService.logs.add(log);
+                
                 return;
             }
 
