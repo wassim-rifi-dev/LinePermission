@@ -107,7 +107,7 @@ public class LogsService {
                                 .stream()
                                 .max(Map.Entry.comparingByValue())
                                 .map(Map.Entry::getKey)
-                                .toString();
+                                .orElse("Aucune utilisateur n'existe.");
 
         System.out.println("L'utilisateur le plus actif est : " + user);
     }
