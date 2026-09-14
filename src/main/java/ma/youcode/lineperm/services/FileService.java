@@ -4,11 +4,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Scanner;
 
 import ma.youcode.lineperm.constants.FilePaths;
+import ma.youcode.lineperm.models.AccessLog;
 import ma.youcode.lineperm.models.FichierProtege;
+import ma.youcode.lineperm.models.enums.LogResult;
+import ma.youcode.lineperm.models.enums.LogType;
 
 public class FileService {
 
@@ -26,17 +31,22 @@ public class FileService {
             }
 
             Path filesFile = Path.of(FilePaths.filesFile);
+            Path logsFile = Path.of(FilePaths.LOGS_FILE);
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
 
             String fileWriting = "rwd|--- " + AuthService.currentUser + " " + fileName;
+            String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + AuthService.currentUser + ";" + LogType.CREATION + ";" + fileName + ";" + LogResult.OK;
 
             Files.createFile(filePath);
 
             Files.writeString(filesFile , fileWriting + System.lineSeparator(), StandardOpenOption.APPEND);
+            Files.writeString(logsFile , logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
 
             FichierProtege fichierProtege = new FichierProtege("rwd|---", AuthService.currentUser, fileName);
+            AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.CREATION, fileName, LogResult.OK);
 
             UserService.files.put(fileName, fichierProtege);
+            UserService.logs.add(log);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -57,9 +67,10 @@ public class FileService {
     public void cat(String fileName) {
         try {
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
+            Path logsFile = Path.of(FilePaths.LOGS_FILE);
 
-            if (UserService.files.containsKey(fileName)) {
-                System.out.println("Ce file est existe.");
+            if (!UserService.files.containsKey(fileName)) {
+                System.out.println("Ce file n'existe pas.");
                 return;
             }
 
@@ -70,12 +81,24 @@ public class FileService {
                 String[] permissionPart = filePermission.trim().split("\\|", 2);
 
                 if (!permissionPart[1].contains("r")) {
+                    String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + AuthService.currentUser + ";" + LogType.LECTURE + ";" + fileName + ";" + LogResult.REFUSE;
+                    Files.writeString(logsFile, logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
+
+                    AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.LECTURE, fileName, LogResult.REFUSE);
+                    UserService.logs.add(log);
+
                     System.out.println("Vous n'avez pas l'acces.");
                     return;
                 }
             }
 
             String content = Files.readString(filePath);
+
+            String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + AuthService.currentUser + ";" + LogType.LECTURE + ";" + fileName + ";" + LogResult.OK;
+            Files.writeString(logsFile, logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
+
+            AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.LECTURE, fileName, LogResult.OK);
+            UserService.logs.add(log);
 
             System.out.println(content);
         } catch (IOException e) {
@@ -86,19 +109,26 @@ public class FileService {
     public void nano(String fileName) {
         try {
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
-            
-            if (UserService.files.containsKey(fileName)) {
-                System.out.println("Ce file est existe.");
+            Path logsFile = Path.of(FilePaths.LOGS_FILE);
+
+            if (!UserService.files.containsKey(fileName)) {
+                System.out.println("Ce file n'existe pas.");
                 return;
             }
-            
+
             String fileOwner = UserService.files.get(fileName).getOwner();
             String filePermission = UserService.files.get(fileName).getPermissions();
-            
+
             if (!fileOwner.equals(AuthService.currentUser)) {
                 String[] permissionPart = filePermission.trim().split("\\|", 2);
-                
+
                 if (!permissionPart[1].contains("w")) {
+                    String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + AuthService.currentUser + ";" + LogType.ECRITURE + ";" + fileName + ";" + LogResult.REFUSE;
+                    Files.writeString(logsFile, logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
+
+                    AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.ECRITURE, fileName, LogResult.REFUSE);
+                    UserService.logs.add(log);
+
                     System.out.println("Vous n'avez pas l'acces.");
                     return;
                 }
@@ -115,9 +145,15 @@ public class FileService {
                 newContent = scanner.nextLine();
 
                 if (!newContent.trim().split(" ")[0].equals("EOF")) {
-                    Files.writeString(filePath, newContent + System.lineSeparator() , StandardOpenOption.APPEND);
+                    Files.writeString(filePath, newContent + System.lineSeparator(), StandardOpenOption.APPEND);
                 }
             } while (!newContent.trim().split(" ")[0].equals("EOF"));
+
+            String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + AuthService.currentUser + ";" + LogType.ECRITURE + ";" + fileName + ";" + LogResult.OK;
+            Files.writeString(logsFile, logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
+
+            AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.ECRITURE, fileName, LogResult.OK);
+            UserService.logs.add(log);
 
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
@@ -126,8 +162,8 @@ public class FileService {
 
     public void chmod(String fileName , String per) {
         try {
-            if (UserService.files.containsKey(fileName)) {
-                System.out.println("Ce file est existe.");
+            if (!UserService.files.containsKey(fileName)) {
+                System.out.println("Ce file n'existe pas.");
                 return;
             }
 

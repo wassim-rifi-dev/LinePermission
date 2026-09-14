@@ -3,19 +3,26 @@ package ma.youcode.lineperm.services;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 
 import ma.youcode.lineperm.constants.FilePaths;
+import ma.youcode.lineperm.models.AccessLog;
 import ma.youcode.lineperm.models.FichierProtege;
 import ma.youcode.lineperm.models.User;
+import ma.youcode.lineperm.models.enums.LogResult;
+import ma.youcode.lineperm.models.enums.LogType;
 
 public class UserService {
     public static HashMap<String , User> users = new HashMap<>();
     public static HashMap<String , FichierProtege> files = new HashMap<>();
+    public static List<AccessLog> logs = new ArrayList<>();
 
     public UserService() {
         loadUsers();
         loadFiles();
+        loadLogs();
     }
 
     public void loadUsers() {
@@ -60,6 +67,32 @@ public class UserService {
                     files.put(file, fichierProtege);
                 }
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public void loadLogs() {
+        try {
+            Path logsFile = Path.of(FilePaths.LOGS_FILE);
+
+            List<String> logsLines = Files.readAllLines(logsFile);
+
+            logsLines.stream()
+                        .forEach(line -> {
+                            String[] parts = line.split(";" , 6);
+
+                            if (parts.length == 6) {
+                                LocalDate date = LocalDate.parse(parts[0]);
+                                LocalTime time = LocalTime.parse(parts[1]);
+                                String user = parts[2];
+                                LogType type = LogType.valueOf(parts[3]);
+                                String file = parts[4];
+                                LogResult result = LogResult.valueOf(parts[5]);
+
+                                logs.add(new AccessLog(date, time, user, type, file, result));
+                            }
+                        });
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
