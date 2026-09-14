@@ -5,6 +5,7 @@ import java.util.Scanner;
 import ma.youcode.lineperm.exceptions.UserAlreadyExisteException;
 import ma.youcode.lineperm.services.AuthService;
 import ma.youcode.lineperm.services.FileService;
+import ma.youcode.lineperm.services.LogsService;
 import ma.youcode.lineperm.services.UserService;
 
 public class ConsoleApp {
@@ -15,11 +16,13 @@ public class ConsoleApp {
     public final AuthService authService;
     public final UserService userService;
     public final FileService fileService;
+    public final LogsService logsService;
 
-    public ConsoleApp(AuthService authService , UserService userService , FileService fileService) {
+    public ConsoleApp(AuthService authService , UserService userService , FileService fileService, LogsService logsService) {
         this.authService = authService;
         this.userService = userService;
         this.fileService = fileService;
+        this.logsService = logsService;
     }
 
     Scanner scanner = new Scanner(System.in);
@@ -155,16 +158,24 @@ public class ConsoleApp {
         System.out.println("8) Repartition des action par type");
         System.out.println("0) Quitter");
 
-        System.out.print("Choix : ");
-        statChoix = scanner.nextInt();
-
-        switch (statChoix) {
-            case 0:
-                break;
         
-            default:
-                System.out.println("Commande note existe");
-                break;
-        }
+        do {
+            System.out.print("Choix : ");
+            statChoix = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (statChoix) {
+                case 0:
+                    break;
+
+                case 1:
+                    logsService.logsNumberTotal();
+                    break;
+            
+                default:
+                    System.out.println("Commande note existe");
+                    break;
+            }
+        } while (statChoix != 0);
     }
 }
