@@ -1,0 +1,2 @@
+rwd|--- wassim test.txt
+rwd|rw- wassim rifi.txt
