@@ -2,12 +2,19 @@ package ma.youcode.lineperm.services;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import ma.youcode.lineperm.models.AccessLog;
 import ma.youcode.lineperm.models.enums.LogResult;
 
 public class LogsService {
+
+    private final Scanner scanner;
+
+    public LogsService(Scanner scanner) {
+        this.scanner = scanner;
+    }
 
     public void logsNumberTotal() {
         long number = UserService.logs.stream().count();
@@ -70,5 +77,22 @@ public class LogsService {
                                                 .toList();
 
         topThreeFiles.stream().forEach(System.out::print);
+    }
+
+    public void userLogRefused() {
+        System.out.print("Entrer le nom d'utilisateur : ");
+        String user = scanner.nextLine();
+
+        if (!UserService.users.containsKey(user)) {
+            System.out.println("Se utilisateur n'existe pas.");
+            return;
+        }
+
+        long refusedLogUser = UserService.logs.stream()
+                                            .filter(log -> log.getUser() == user)
+                                            .filter(log -> log.getResult() == LogResult.REFUSE)
+                                            .count();
+
+        System.out.println("Nombre refuse d'actions pour " + user + " : " + refusedLogUser);
     }
 }

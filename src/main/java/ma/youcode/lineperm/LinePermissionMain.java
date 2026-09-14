@@ -25,7 +25,7 @@ public class LinePermissionMain {
         AuthService authService = new AuthService();
         UserService userService = new UserService();
         FileService fileService = new FileService(new Scanner(System.in));
-        LogsService logsService = new LogsService();
+        LogsService logsService = new LogsService(new Scanner(System.in));
 
         ConsoleApp consoleApp = new ConsoleApp(authService , userService , fileService, logsService);
 

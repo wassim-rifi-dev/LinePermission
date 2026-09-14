@@ -188,6 +188,10 @@ public class ConsoleApp {
                     logsService.topThreeFile();
                     break;
 
+                case 6:
+                    logsService.userLogRefused();
+                    break;
+
                 default:
                     System.out.println("Commande note existe");
                     break;
