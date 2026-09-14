@@ -171,7 +171,11 @@ public class ConsoleApp {
                 case 1:
                     logsService.logsNumberTotal();
                     break;
-            
+
+                case 2:
+                    logsService.refusedLogsNumber();
+                    break;
+
                 default:
                     System.out.println("Commande note existe");
                     break;
