@@ -118,6 +118,6 @@ public class LogsService {
                     .collect(Collectors.groupingBy(AccessLog::getType , Collectors.counting()))
                     .entrySet()
                     .stream()
-                    .forEach(log -> System.out.println(log.getKey() + " : " + log.getValue()));
+                    .forEach(log -> System.out.println("   - " + log.getKey() + " : " + log.getValue()));
     }
 }
