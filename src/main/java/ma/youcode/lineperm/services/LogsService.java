@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import ma.youcode.lineperm.models.AccessLog;
 import ma.youcode.lineperm.models.enums.LogResult;
-import ma.youcode.lineperm.models.enums.LogType;
 
 public class LogsService {
 
@@ -43,7 +42,8 @@ public class LogsService {
         }
 
         System.out.print("Utilisateurs distincts : ");
-        users.stream().forEach(System.out::println);
+        users.stream().forEach(user -> System.out.print(user + " | "));
+        System.out.println();
     }
 
     public void logsNumberByUser() {
