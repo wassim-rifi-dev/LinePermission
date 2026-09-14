@@ -1,2 +1,2 @@
-rwd|--- wassim test.txt
-rwd|rw- wassim rifi.txt
+rwd|--- wassim rifi.txt
+rwd|--- rifi wassim.txt

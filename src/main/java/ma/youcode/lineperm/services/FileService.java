@@ -69,8 +69,8 @@ public class FileService {
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
             Path logsFile = Path.of(FilePaths.LOGS_FILE);
 
-            if (UserService.files.containsKey(fileName)) {
-                System.out.println("Ce file est existe.");
+            if (!UserService.files.containsKey(fileName)) {
+                System.out.println("Ce file n'existe pas.");
                 return;
             }
 
@@ -111,8 +111,8 @@ public class FileService {
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
             Path logsFile = Path.of(FilePaths.LOGS_FILE);
 
-            if (UserService.files.containsKey(fileName)) {
-                System.out.println("Ce file est existe.");
+            if (!UserService.files.containsKey(fileName)) {
+                System.out.println("Ce file n'existe pas.");
                 return;
             }
 
@@ -162,8 +162,8 @@ public class FileService {
 
     public void chmod(String fileName , String per) {
         try {
-            if (UserService.files.containsKey(fileName)) {
-                System.out.println("Ce file est existe.");
+            if (!UserService.files.containsKey(fileName)) {
+                System.out.println("Ce file n'existe pas.");
                 return;
             }
 

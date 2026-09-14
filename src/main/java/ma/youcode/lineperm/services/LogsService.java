@@ -90,8 +90,8 @@ public class LogsService {
         }
 
         long refusedLogUser = UserService.logs.stream()
-                                            .filter(log -> log.getUser() == user)
                                             .filter(log -> log.getResult() == LogResult.REFUSE)
+                                            .filter(log -> log.getUser().equals(user))
                                             .count();
 
         System.out.println("Nombre refuse d'actions pour " + user + " : " + refusedLogUser);
