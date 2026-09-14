@@ -180,8 +180,12 @@ public class ConsoleApp {
                     logsService.distinctUsers();
                     break;
 
-                case 4 :
+                case 4:
                     logsService.logsNumberByUser();
+                    break;
+
+                case 5:
+                    logsService.topThreeFile();
                     break;
 
                 default:

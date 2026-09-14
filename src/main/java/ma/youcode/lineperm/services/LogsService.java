@@ -55,4 +55,20 @@ public class LogsService {
                         .forEach(user -> System.out.print(user.getKey() + " : " + user.getValue()));
         System.out.println("");
     }
+
+    public void topThreeFile() {
+        List<String> topThreeFiles = UserService.logs.stream()
+                                                .collect(Collectors.groupingBy(
+                                                    AccessLog::getFile,
+                                                    Collectors.counting()
+                                                ))
+                                                .entrySet()
+                                                .stream()
+                                                .sorted(Map.Entry.comparingByValue())
+                                                .limit(3)
+                                                .map(Map.Entry::getKey)
+                                                .toList();
+
+        topThreeFiles.stream().forEach(System.out::print);
+    }
 }
