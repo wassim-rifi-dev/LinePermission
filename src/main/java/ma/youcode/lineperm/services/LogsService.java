@@ -72,12 +72,13 @@ public class LogsService {
                                                 ))
                                                 .entrySet()
                                                 .stream()
-                                                .sorted(Map.Entry.comparingByValue())
+                                                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                                                 .limit(3)
                                                 .map(Map.Entry::getKey)
                                                 .toList();
 
-        topThreeFiles.stream().forEach(System.out::print);
+        System.out.println("Le top 3 fichier : ");
+        topThreeFiles.stream().forEach(f -> System.out.println("   - " + f));
     }
 
     public void userLogRefused() {
