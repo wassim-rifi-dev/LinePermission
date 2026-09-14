@@ -32,6 +32,6 @@ public class LogsService {
         }
 
         System.out.print("Utilisateurs distincts : ");
-        users.stream().forEach(System.out::print);
+        users.stream().forEach(System.out::println);
     }
 }
