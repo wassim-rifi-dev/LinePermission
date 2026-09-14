@@ -1,5 +1,7 @@
 package ma.youcode.lineperm.services;
 
+import java.util.List;
+
 import ma.youcode.lineperm.models.enums.LogResult;
 
 public class LogsService {
@@ -16,5 +18,20 @@ public class LogsService {
                                 .count();
 
         System.out.println("Nombre refuse d'actions : " + number);
+    }
+
+    public void distinctUsers() {
+        List<String> users = UserService.logs.stream()
+                                        .map(log -> log.getUser())
+                                        .distinct()
+                                        .toList();
+
+        if (users.isEmpty()) {
+            System.out.println("Aucune utilisateurs a des activites.");
+            return;
+        }
+
+        System.out.print("Utilisateurs distincts : ");
+        users.stream().forEach(System.out::print);
     }
 }
