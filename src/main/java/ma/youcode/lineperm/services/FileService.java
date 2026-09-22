@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Scanner;
 
 import ma.youcode.lineperm.constants.FilePaths;
-import ma.youcode.lineperm.models.AccessLog;
-import ma.youcode.lineperm.models.FichierProtege;
+import ma.youcode.lineperm.models.Fichier;
+import ma.youcode.lineperm.models.Log;
 import ma.youcode.lineperm.models.enums.LogResult;
 import ma.youcode.lineperm.models.enums.LogType;
 
@@ -33,7 +33,7 @@ public class FileService {
                 String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + AuthService.currentUser + ";" + LogType.CREATION + ";" + fileName + ";" + LogResult.REFUSE;
                 Files.writeString(logsFile , logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
 
-                AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.CREATION, fileName, LogResult.REFUSE);
+                Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.CREATION, fileName, LogResult.REFUSE);
                 UserService.logs.add(log);
 
                 return;
@@ -50,8 +50,8 @@ public class FileService {
             Files.writeString(filesFile , fileWriting + System.lineSeparator(), StandardOpenOption.APPEND);
             Files.writeString(logsFile , logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
 
-            FichierProtege fichierProtege = new FichierProtege("rwd|---", AuthService.currentUser, fileName);
-            AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.CREATION, fileName, LogResult.OK);
+            Fichier fichierProtege = new Fichier("rwd|---", AuthService.currentUser, fileName);
+            Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.CREATION, fileName, LogResult.OK);
 
             UserService.files.put(fileName, fichierProtege);
             UserService.logs.add(log);
@@ -82,7 +82,7 @@ public class FileService {
                 String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + AuthService.currentUser + ";" + LogType.LECTURE + ";" + fileName + ";" + LogResult.REFUSE;
                 Files.writeString(logsFile , logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
 
-                AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.LECTURE, fileName, LogResult.REFUSE);
+                Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.LECTURE, fileName, LogResult.REFUSE);
                 UserService.logs.add(log);
 
                 return;
@@ -98,7 +98,7 @@ public class FileService {
                     String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + AuthService.currentUser + ";" + LogType.LECTURE + ";" + fileName + ";" + LogResult.REFUSE;
                     Files.writeString(logsFile, logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
 
-                    AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.LECTURE, fileName, LogResult.REFUSE);
+                    Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.LECTURE, fileName, LogResult.REFUSE);
                     UserService.logs.add(log);
 
                     System.out.println("Vous n'avez pas l'acces.");
@@ -111,7 +111,7 @@ public class FileService {
             String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + AuthService.currentUser + ";" + LogType.LECTURE + ";" + fileName + ";" + LogResult.OK;
             Files.writeString(logsFile, logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
 
-            AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.LECTURE, fileName, LogResult.OK);
+            Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.LECTURE, fileName, LogResult.OK);
             UserService.logs.add(log);
 
             System.out.println(content);
@@ -130,7 +130,7 @@ public class FileService {
                 String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + AuthService.currentUser + ";" + LogType.ECRITURE + ";" + fileName + ";" + LogResult.REFUSE;
                 Files.writeString(logsFile , logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
 
-                AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.ECRITURE, fileName, LogResult.REFUSE);
+                Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.ECRITURE, fileName, LogResult.REFUSE);
                 UserService.logs.add(log);
                 
                 return;
@@ -146,7 +146,7 @@ public class FileService {
                     String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + AuthService.currentUser + ";" + LogType.ECRITURE + ";" + fileName + ";" + LogResult.REFUSE;
                     Files.writeString(logsFile, logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
 
-                    AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.ECRITURE, fileName, LogResult.REFUSE);
+                    Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.ECRITURE, fileName, LogResult.REFUSE);
                     UserService.logs.add(log);
 
                     System.out.println("Vous n'avez pas l'acces.");
@@ -172,7 +172,7 @@ public class FileService {
             String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + AuthService.currentUser + ";" + LogType.ECRITURE + ";" + fileName + ";" + LogResult.OK;
             Files.writeString(logsFile, logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
 
-            AccessLog log = new AccessLog(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.ECRITURE, fileName, LogResult.OK);
+            Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), AuthService.currentUser, LogType.ECRITURE, fileName, LogResult.OK);
             UserService.logs.add(log);
 
         } catch (IOException e) {
@@ -229,7 +229,7 @@ public class FileService {
 
                 String newLine = "rwd|" + newOtherPer + " " + fileOwner + " " + fileName;
 
-                FichierProtege fichierProtege = new FichierProtege("rwd|" + newOtherPer , fileOwner, fileName);
+                Fichier fichierProtege = new Fichier("rwd|" + newOtherPer , fileOwner, fileName);
 
                 UserService.files.put(fileName, fichierProtege);
                 fileLines.set(i, newLine);
@@ -260,7 +260,7 @@ public class FileService {
 
                 String newLine = "rwd|" + newOtherPer + " " + fileOwner + " " + fileName;
 
-                FichierProtege fichierProtege = new FichierProtege("rwd|" + newOtherPer , fileOwner, fileName);
+                Fichier fichierProtege = new Fichier("rwd|" + newOtherPer , fileOwner, fileName);
 
                 UserService.files.put(fileName, fichierProtege);
                 fileLines.set(i, newLine);

@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-import ma.youcode.lineperm.models.AccessLog;
+import ma.youcode.lineperm.models.Log;
 import ma.youcode.lineperm.models.enums.LogResult;
 
 public class LogsService {
@@ -49,7 +49,7 @@ public class LogsService {
     public void logsNumberByUser() {
         Map<String, Long> logsNumberByUser = UserService.logs.stream()
                                                             .collect(Collectors.groupingBy(
-                                                                AccessLog::getUser,
+                                                                Log::getUser,
                                                                 Collectors.counting()
                                                             ));
 
@@ -67,7 +67,7 @@ public class LogsService {
     public void topThreeFile() {
         List<String> topThreeFiles = UserService.logs.stream()
                                                 .collect(Collectors.groupingBy(
-                                                    AccessLog::getFile,
+                                                    Log::getFile,
                                                     Collectors.counting()
                                                 ))
                                                 .entrySet()
@@ -101,7 +101,7 @@ public class LogsService {
     public void actifUser() {
         String user = UserService.logs.stream()
                                 .collect(Collectors.groupingBy(
-                                    AccessLog::getUser, 
+                                    Log::getUser, 
                                     Collectors.counting()
                                 ))
                                 .entrySet()
@@ -115,7 +115,7 @@ public class LogsService {
 
     public void actionByType() {
         UserService.logs.stream()
-                    .collect(Collectors.groupingBy(AccessLog::getType , Collectors.counting()))
+                    .collect(Collectors.groupingBy(Log::getType , Collectors.counting()))
                     .entrySet()
                     .stream()
                     .forEach(log -> System.out.println("   - " + log.getKey() + " : " + log.getValue()));

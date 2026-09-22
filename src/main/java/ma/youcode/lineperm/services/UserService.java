@@ -8,16 +8,16 @@ import java.time.LocalTime;
 import java.util.*;
 
 import ma.youcode.lineperm.constants.FilePaths;
-import ma.youcode.lineperm.models.AccessLog;
-import ma.youcode.lineperm.models.FichierProtege;
+import ma.youcode.lineperm.models.Fichier;
+import ma.youcode.lineperm.models.Log;
 import ma.youcode.lineperm.models.User;
 import ma.youcode.lineperm.models.enums.LogResult;
 import ma.youcode.lineperm.models.enums.LogType;
 
 public class UserService {
     public static HashMap<String , User> users = new HashMap<>();
-    public static HashMap<String , FichierProtege> files = new HashMap<>();
-    public static List<AccessLog> logs = new ArrayList<>();
+    public static HashMap<String , Fichier> files = new HashMap<>();
+    public static List<Log> logs = new ArrayList<>();
 
     public UserService() {
         loadUsers();
@@ -62,7 +62,7 @@ public class UserService {
                     String owner = parts[1];
                     String file = parts[2];
 
-                    FichierProtege fichierProtege = new FichierProtege(permission, owner, file);
+                    Fichier fichierProtege = new Fichier(permission, owner, file);
 
                     files.put(file, fichierProtege);
                 }
@@ -90,7 +90,7 @@ public class UserService {
                                 String file = parts[4];
                                 LogResult result = LogResult.valueOf(parts[5]);
 
-                                logs.add(new AccessLog(date, time, user, type, file, result));
+                                logs.add(new Log(date, time, user, type, file, result));
                             }
                         });
         } catch (IOException e) {

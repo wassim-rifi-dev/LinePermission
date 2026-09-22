@@ -1,11 +1,11 @@
 package ma.youcode.lineperm.models;
 
-public class FichierProtege {
+public class Fichier {
     private String permissions;
     private String owner;
     private String fileName;
 
-    public FichierProtege(String permissions, String owner, String fileName) {
+    public Fichier(String permissions, String owner, String fileName) {
         this.permissions = permissions;
         this.owner = owner;
         this.fileName = fileName;

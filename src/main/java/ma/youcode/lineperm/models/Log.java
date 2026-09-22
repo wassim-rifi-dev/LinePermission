@@ -6,7 +6,7 @@ import java.time.LocalTime;
 import ma.youcode.lineperm.models.enums.LogResult;
 import ma.youcode.lineperm.models.enums.LogType;
 
-public class AccessLog {
+public class Log {
     private LocalDate date;
     private LocalTime time;
     private String user;
@@ -14,7 +14,7 @@ public class AccessLog {
     private String file;
     private LogResult result;
     
-    public AccessLog(LocalDate date, LocalTime time, String user, LogType type, String file, LogResult result) {
+    public Log(LocalDate date, LocalTime time, String user, LogType type, String file, LogResult result) {
         this.date = date;
         this.time = time;
         this.user = user;
