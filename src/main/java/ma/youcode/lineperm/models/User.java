@@ -5,14 +5,23 @@ public class User {
     private String username;
     private String password;
 
-    public User(String username , String password) {
+    public User(String username, String password) {
         setUsername(username);
         setPassword(password);
     }
 
-    public User(long id, String username , String password) {
+    public User(Long id, String username, String password) {
+        this.id = id;
         setUsername(username);
         setPassword(password);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getUsername() {
@@ -30,12 +39,4 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
 }

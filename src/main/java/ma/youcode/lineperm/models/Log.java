@@ -10,12 +10,12 @@ public class Log {
     private Long id;
     private LocalDate date;
     private LocalTime time;
-    private String user;
+    private User user;
     private LogType type;
-    private String file;
+    private Fichier file;
     private LogResult result;
-    
-    public Log(long id, LocalDate date, LocalTime time, String user, LogType type, String file, LogResult result) {
+
+    public Log(LocalDate date, LocalTime time, User user, LogType type, Fichier file, LogResult result) {
         this.date = date;
         this.time = time;
         this.user = user;
@@ -24,13 +24,22 @@ public class Log {
         this.result = result;
     }
 
-    public Log(LocalDate date, LocalTime time, String user, LogType type, String file, LogResult result) {
+    public Log(Long id, LocalDate date, LocalTime time, User user, LogType type, Fichier file, LogResult result) {
+        this.id = id;
         this.date = date;
         this.time = time;
         this.user = user;
         this.type = type;
         this.file = file;
         this.result = result;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public LocalDate getDate() {
@@ -49,11 +58,11 @@ public class Log {
         this.time = time;
     }
 
-    public String getUser() {
+    public User getUser() {
         return user;
     }
 
-    public void setUser(String user) {
+    public void setUser(User user) {
         this.user = user;
     }
 
@@ -65,11 +74,11 @@ public class Log {
         this.type = type;
     }
 
-    public String getFile() {
+    public Fichier getFile() {
         return file;
     }
 
-    public void setFile(String file) {
+    public void setFile(Fichier file) {
         this.file = file;
     }
 
@@ -80,12 +89,4 @@ public class Log {
     public void setResult(LogResult result) {
         this.result = result;
     }
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
 }

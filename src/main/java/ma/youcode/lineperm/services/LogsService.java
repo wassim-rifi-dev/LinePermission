@@ -32,7 +32,7 @@ public class LogsService {
 
     public void distinctUsers() {
         List<String> users = UserService.logs.stream()
-                                        .map(log -> log.getUser())
+                                        .map(log -> log.getUser().getUsername())
                                         .distinct()
                                         .toList();
 
@@ -49,7 +49,7 @@ public class LogsService {
     public void logsNumberByUser() {
         Map<String, Long> logsNumberByUser = UserService.logs.stream()
                                                             .collect(Collectors.groupingBy(
-                                                                Log::getUser,
+                                                                log -> log.getUser().getUsername(),
                                                                 Collectors.counting()
                                                             ));
 
@@ -66,8 +66,9 @@ public class LogsService {
 
     public void topThreeFile() {
         List<String> topThreeFiles = UserService.logs.stream()
+                                                .filter(log -> log.getFile() != null)
                                                 .collect(Collectors.groupingBy(
-                                                    Log::getFile,
+                                                    log -> log.getFile().getFileName(),
                                                     Collectors.counting()
                                                 ))
                                                 .entrySet()
@@ -92,7 +93,7 @@ public class LogsService {
 
         long refusedLogUser = UserService.logs.stream()
                                             .filter(log -> log.getResult() == LogResult.REFUSE)
-                                            .filter(log -> log.getUser().equals(user))
+                                            .filter(log -> log.getUser().getUsername().equals(user))
                                             .count();
 
         System.out.println("Nombre refuse d'actions pour " + user + " : " + refusedLogUser);
@@ -101,7 +102,7 @@ public class LogsService {
     public void actifUser() {
         String user = UserService.logs.stream()
                                 .collect(Collectors.groupingBy(
-                                    Log::getUser, 
+                                    log -> log.getUser().getUsername(),
                                     Collectors.counting()
                                 ))
                                 .entrySet()

@@ -59,8 +59,14 @@ public class UserService {
 
                 if (parts.length == 3) {
                     String permission = parts[0];
-                    String owner = parts[1];
+                    String ownerUsername = parts[1];
                     String file = parts[2];
+
+                    User owner = users.get(ownerUsername);
+
+                    if (owner == null) {
+                        continue;
+                    }
 
                     Fichier fichierProtege = new Fichier(permission, owner, file);
 
@@ -85,10 +91,13 @@ public class UserService {
                             if (parts.length == 6) {
                                 LocalDate date = LocalDate.parse(parts[0]);
                                 LocalTime time = LocalTime.parse(parts[1]);
-                                String user = parts[2];
+                                String username = parts[2];
                                 LogType type = LogType.valueOf(parts[3]);
-                                String file = parts[4];
+                                String fileName = parts[4];
                                 LogResult result = LogResult.valueOf(parts[5]);
+
+                                User user = users.get(username);
+                                Fichier file = files.get(fileName);
 
                                 logs.add(new Log(date, time, user, type, file, result));
                             }
