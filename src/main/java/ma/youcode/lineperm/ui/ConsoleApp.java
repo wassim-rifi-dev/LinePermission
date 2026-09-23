@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import ma.youcode.lineperm.exceptions.UserAlreadyExisteException;
 import ma.youcode.lineperm.services.AuthService;
+import ma.youcode.lineperm.services.DAOService;
 import ma.youcode.lineperm.services.FileService;
 import ma.youcode.lineperm.services.LogsService;
 import ma.youcode.lineperm.services.UserService;
@@ -17,12 +18,14 @@ public class ConsoleApp {
     public final UserService userService;
     public final FileService fileService;
     public final LogsService logsService;
+    public final DAOService daoService;
 
-    public ConsoleApp(AuthService authService , UserService userService , FileService fileService, LogsService logsService) {
+    public ConsoleApp(AuthService authService , UserService userService , FileService fileService, LogsService logsService , DAOService daoService) {
         this.authService = authService;
         this.userService = userService;
         this.fileService = fileService;
         this.logsService = logsService;
+        this.daoService = daoService;
     }
 
     Scanner scanner = new Scanner(System.in);
