@@ -1,11 +1,18 @@
 package ma.youcode.lineperm.models;
 
 public class Fichier {
+    private Long id;
     private String permissions;
     private String owner;
     private String fileName;
 
     public Fichier(String permissions, String owner, String fileName) {
+        this.permissions = permissions;
+        this.owner = owner;
+        this.fileName = fileName;
+    }
+
+    public Fichier(long id, String permissions, String owner, String fileName) {
         this.permissions = permissions;
         this.owner = owner;
         this.fileName = fileName;
@@ -28,5 +35,13 @@ public class Fichier {
     }
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

@@ -7,6 +7,7 @@ import ma.youcode.lineperm.models.enums.LogResult;
 import ma.youcode.lineperm.models.enums.LogType;
 
 public class Log {
+    private Long id;
     private LocalDate date;
     private LocalTime time;
     private String user;
@@ -14,6 +15,15 @@ public class Log {
     private String file;
     private LogResult result;
     
+    public Log(long id, LocalDate date, LocalTime time, String user, LogType type, String file, LogResult result) {
+        this.date = date;
+        this.time = time;
+        this.user = user;
+        this.type = type;
+        this.file = file;
+        this.result = result;
+    }
+
     public Log(LocalDate date, LocalTime time, String user, LogType type, String file, LogResult result) {
         this.date = date;
         this.time = time;
@@ -70,4 +80,12 @@ public class Log {
     public void setResult(LogResult result) {
         this.result = result;
     }
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 }
