@@ -92,7 +92,7 @@ public class ConsoleApp {
     }
 
     public void isAuthDesign() {
-        System.out.print(AuthService.currentUser + "@lineperm> ");
+        System.out.print(AuthService.currentUser.getUsername() + "@lineperm> ");
         prompt = scanner.nextLine();
 
         String[] parts = ConsoleApp.prompt.trim().split(" ");
