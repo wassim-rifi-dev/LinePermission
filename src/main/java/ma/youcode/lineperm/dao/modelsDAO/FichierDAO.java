@@ -67,7 +67,6 @@ public class FichierDAO extends AbstractDAO<Fichier> {
                     );
                 }
             }
-
         } catch (SQLException e) {
             System.out.println("Error : " + e.getMessage());
         }
@@ -88,7 +87,6 @@ public class FichierDAO extends AbstractDAO<Fichier> {
             int rowsAffected = statement.executeUpdate();
 
             return rowsAffected > 0;
-
         } catch (SQLException e) {
             System.out.println("Error : " + e.getMessage());
         }
@@ -125,11 +123,30 @@ public class FichierDAO extends AbstractDAO<Fichier> {
                     ));
                 }
             }
-
         } catch (SQLException e) {
             System.out.println("Error : " + e.getMessage());
         }
 
         return fichiers;
+    }
+
+    public boolean updatePermissions(long id, String newPermissions) {
+        String sql = "UPDATE fichiers SET permissions = ? WHERE id = ?";
+
+        try (
+            Connection connection = AbstractDAO.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+            statement.setString(1, newPermissions);
+            statement.setLong(2, id);
+
+            int rowsAffected = statement.executeUpdate();
+
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println("Error : " + e.getMessage());
+        }
+
+        return false;
     }
 }
