@@ -8,6 +8,7 @@ import java.sql.Statement;
 
 import ma.youcode.lineperm.dao.AbstractDAO;
 import ma.youcode.lineperm.models.Fichier;
+import ma.youcode.lineperm.models.User;
 
 public class FichierDAO extends AbstractDAO<Fichier> {
     @Override
@@ -37,6 +38,38 @@ public class FichierDAO extends AbstractDAO<Fichier> {
 
     @Override
     public Fichier findById(long id) {
+        String sql = "SELECT * FROM fichiers WHERE id = ?";
+
+        try (
+            Connection connection = AbstractDAO.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+            UserDAO userDAO = new UserDAO();
+
+            statement.setLong(1, id);
+
+            try (ResultSet result = statement.executeQuery()) {
+                if (result.next()) {
+                    User user = userDAO.findById(result.getLong("owner_id"));
+
+                    if (user == null) {
+                        System.out.println("User not exeste.");
+                        return null;
+                    }
+                    
+                    return new Fichier(
+                        result.getLong("id"), 
+                        result.getString("permissions"), 
+                        user, 
+                        result.getString("file_name")
+                    );
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error : " + e.getMessage());
+        }
+
         return null;
     }
 
