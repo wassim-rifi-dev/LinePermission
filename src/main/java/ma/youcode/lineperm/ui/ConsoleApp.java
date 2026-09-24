@@ -69,16 +69,7 @@ public class ConsoleApp {
 
         switch (ConsoleApp.choix) {
             case "signup":
-                try {
-                    String[] singupInformations = singUpChoix();
-
-                    String signUpUsername = singupInformations[0];
-                    String signUpPassword = singupInformations[1];
-
-                    authService.singUp(signUpUsername, signUpPassword);
-                } catch (UserAlreadyExisteException e) {
-                    System.out.println(e.getMessage());
-                }
+                authService.singUp(singUpChoix());
                 break;
 
             case "login":

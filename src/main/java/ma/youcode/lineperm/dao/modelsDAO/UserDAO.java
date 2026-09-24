@@ -35,9 +35,16 @@ public class UserDAO extends AbstractDAO<User> {
         ) {
             statement.setString(1, username);
 
-            ResultSet result = statement.executeQuery();
+            try (ResultSet result = statement.executeQuery();) {
+                if (result.next()) {
+                    return new User(
+                        result.getInt("id"),
+                        result.getString("username"),
+                        result.getString("password")
+                    );
+                }
+            }
 
-            return new User(result.getInt("id"), result.getString("username"), result.getString("password"));
         } catch (SQLException e) {
             System.out.println("Error : " + e.getMessage());
         }

@@ -16,7 +16,7 @@ public class DAOService {
     public void createUserTable() {
         String sql = """
                 CREATE TABLE IF NOT EXISTS users (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    id INTEGER PRIMARY KEY,
                     username VARCHAR(100) NOT NULL UNIQUE,
                     password VARCHAR(255) NOT NULL
                 );
@@ -35,11 +35,14 @@ public class DAOService {
     public void createFichierTable() {
         String sql = """
                 CREATE TABLE IF NOT EXISTS fichiers (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    id INTEGER PRIMARY KEY,
                     permissions VARCHAR(20) NOT NULL,
-                    owner_id INT NOT NULL,
+                    owner_id INTEGER NOT NULL,
                     file_name VARCHAR(255) NOT NULL,
-                    CONSTRAINT fk_fichier_owner FOREIGN KEY (owner_id) REFERENCES users(id)
+
+                    CONSTRAINT fk_fichier_owner
+                        FOREIGN KEY (owner_id)
+                        REFERENCES users(id)
                         ON DELETE CASCADE
                 );
                 """;
@@ -57,16 +60,22 @@ public class DAOService {
     public void createLogTable() {
         String sql = """
                 CREATE TABLE IF NOT EXISTS logs (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    id INTEGER PRIMARY KEY,
                     log_date DATE NOT NULL,
                     log_time TIME NOT NULL,
-                    user_id INT,
+                    user_id INTEGER,
                     type VARCHAR(20) NOT NULL,
-                    file_id INT,
+                    file_id INTEGER,
                     result VARCHAR(20) NOT NULL,
-                    CONSTRAINT fk_log_user FOREIGN KEY (user_id) REFERENCES users(id)
+
+                    CONSTRAINT fk_log_user
+                        FOREIGN KEY (user_id)
+                        REFERENCES users(id)
                         ON DELETE SET NULL,
-                    CONSTRAINT fk_log_file FOREIGN KEY (file_id) REFERENCES fichiers(id)
+
+                    CONSTRAINT fk_log_file
+                        FOREIGN KEY (file_id)
+                        REFERENCES fichiers(id)
                         ON DELETE SET NULL
                 );
                 """;
