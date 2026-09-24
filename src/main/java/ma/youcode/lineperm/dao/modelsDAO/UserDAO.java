@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import ma.youcode.lineperm.dao.AbstractDAO;
 import ma.youcode.lineperm.models.User;
@@ -15,12 +16,19 @@ public class UserDAO extends AbstractDAO<User> {
 
         try (
             Connection connection = AbstractDAO.getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql)
+            PreparedStatement statement = connection.prepareStatement(sql , Statement.RETURN_GENERATED_KEYS)
         ) {
             statement.setString(1, user.getUsername());
             statement.setString(2, user.getPassword());
 
             statement.executeUpdate();
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    long id = generatedKeys.getLong(1);
+                    user.setId(id);
+                }
+            }
         } catch (SQLException e) {
             System.out.println("Error : " + e.getMessage());
         }
