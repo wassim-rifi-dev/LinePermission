@@ -56,7 +56,7 @@ public class FichierDAO extends AbstractDAO<Fichier> {
                         System.out.println("User not exeste.");
                         return null;
                     }
-                    
+
                     return new Fichier(
                         result.getLong("id"), 
                         result.getString("permissions"), 
@@ -74,7 +74,23 @@ public class FichierDAO extends AbstractDAO<Fichier> {
     }
 
     @Override
-    public void delete(Fichier fichier) {
-        
+    public boolean delete(Fichier fichier) {
+        String sql = "DELETE FROM fichiers WHERE id = ?";
+
+        try (
+            Connection connection = AbstractDAO.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+            statement.setLong(1, fichier.getId());
+
+            int rowsAffected = statement.executeUpdate();
+
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Error : " + e.getMessage());
+        }
+
+        return false;
     }
 }

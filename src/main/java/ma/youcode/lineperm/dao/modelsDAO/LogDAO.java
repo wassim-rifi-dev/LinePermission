@@ -15,7 +15,7 @@ public class LogDAO extends AbstractDAO<Log> {
     }
 
     @Override
-    public void delete(Log log) {
-        
+    public boolean delete(Log log) {
+        return false;
     }
 }

@@ -88,7 +88,7 @@ public class UserDAO extends AbstractDAO<User> {
     }
 
     @Override
-    public void delete(User user) {
-
+    public boolean delete(User user) {
+        return false;
     }
 }
