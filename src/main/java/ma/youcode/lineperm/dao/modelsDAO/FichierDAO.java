@@ -149,4 +149,39 @@ public class FichierDAO extends AbstractDAO<Fichier> {
 
         return false;
     }
+
+    public Fichier findByFileName(String fileName) {
+        String sql = "SELECT * FROM fichiers WHERE file_name = ?";
+
+        try (
+            Connection connection = AbstractDAO.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+            UserDAO userDAO = new UserDAO();
+
+            statement.setString(1, fileName);
+
+            try (ResultSet result = statement.executeQuery()) {
+                if (result.next()) {
+                    User user = userDAO.findById(result.getLong("owner_id"));
+
+                    if (user == null) {
+                        System.out.println("User not exeste.");
+                        return null;
+                    }
+
+                    return new Fichier(
+                        result.getLong("id"),
+                        result.getString("permissions"),
+                        user,
+                        result.getString("file_name")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error : " + e.getMessage());
+        }
+
+        return null;
+    } 
 }
