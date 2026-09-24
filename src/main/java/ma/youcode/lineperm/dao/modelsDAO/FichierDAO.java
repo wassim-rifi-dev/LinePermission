@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import ma.youcode.lineperm.dao.AbstractDAO;
 import ma.youcode.lineperm.models.Fichier;
@@ -92,5 +94,42 @@ public class FichierDAO extends AbstractDAO<Fichier> {
         }
 
         return false;
+    }
+
+    public List<Fichier> findByOwner(User owner) {
+        String sql = "SELECT * FROM fichiers WHERE owner_id = ?";
+        List<Fichier> fichiers = new ArrayList<>();
+
+        try (
+            Connection connection = AbstractDAO.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+            UserDAO userDAO = new UserDAO();
+
+            statement.setLong(1, owner.getId());
+
+            try (ResultSet result = statement.executeQuery()) {
+                User o = userDAO.findById(owner.getId());
+
+                if (o == null) {
+                    System.out.println("User not exeste.");
+                    return fichiers;
+                }
+
+                while (result.next()) {
+                    fichiers.add(new Fichier(
+                        result.getLong("id"),
+                        result.getString("permissions"),
+                        o,
+                        result.getString("file_name")
+                    ));
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error : " + e.getMessage());
+        }
+
+        return fichiers;
     }
 }
