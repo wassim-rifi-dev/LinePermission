@@ -9,18 +9,21 @@ public class AuthService {
     public static boolean isAuth = false;
     public static User currentUser = null;
 
-    public void login(String username , String password) throws RuntimeException {
-        if (UserService.users.containsKey(username)) {
+    public void login(String[] userInfo) {
+        UserDAO userDAO = new UserDAO();
 
-            if (!BCrypt.checkpw(password, UserService.users.get(username).getPassword())) {
+        if (userDAO.findByUsername(userInfo[0]) != null) {
+
+            if (!BCrypt.checkpw(userInfo[1], userDAO.findByUsername(userInfo[0]).getPassword())) {
                 System.err.println("Password is incorect.\n");
                 return;
             }
 
             isAuth = true;
-            currentUser = UserService.users.get(username);
+            currentUser = new User(userDAO.findByUsername(userInfo[0]).getId() , userDAO.findByUsername(userInfo[0]).getUsername() , userDAO.findByUsername(userInfo[0]).getPassword());
 
-            System.out.println("");
+            System.out.println();
+            System.out.println("Bienvenu " + userInfo[0]);
         } else {
             System.out.println("Username not exeste.");
         }
@@ -42,6 +45,7 @@ public class AuthService {
         currentUser = newUser;
 
         System.out.println("User creer en success.");
+        System.out.println();
     }
 
     public void logout() {

@@ -10,7 +10,7 @@ public class User {
         setPassword(password);
     }
 
-    public User(int id, String username, String password) {
+    public User(long id, String username, String password) {
         setId(id);
         setUsername(username);
         setPassword(password);
@@ -20,8 +20,8 @@ public class User {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = (long) id;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getUsername() {

@@ -2,7 +2,6 @@ package ma.youcode.lineperm.ui;
 
 import java.util.Scanner;
 
-import ma.youcode.lineperm.exceptions.UserAlreadyExisteException;
 import ma.youcode.lineperm.services.AuthService;
 import ma.youcode.lineperm.services.DAOService;
 import ma.youcode.lineperm.services.FileService;
@@ -73,16 +72,7 @@ public class ConsoleApp {
                 break;
 
             case "login":
-                try {
-                    String[] loginInformations = loginChoix();
-
-                    String loginUsername = loginInformations[0];
-                    String loginPassword = loginInformations[1];
-
-                    authService.login(loginUsername, loginPassword);
-                } catch (UserAlreadyExisteException e) {
-                    System.out.println(e.getMessage());
-                }
+                authService.login(loginChoix());
                 break;
 
                 case "stats" :
