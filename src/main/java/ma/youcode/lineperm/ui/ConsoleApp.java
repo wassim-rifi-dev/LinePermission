@@ -63,7 +63,6 @@ public class ConsoleApp {
     }
 
     public boolean notAuthDesign() {
-        userService.loadUsers();
         start();
 
         switch (ConsoleApp.choix) {

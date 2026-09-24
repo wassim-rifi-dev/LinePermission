@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import ma.youcode.lineperm.dao.modelsDAO.UserDAO;
 import ma.youcode.lineperm.models.Log;
 import ma.youcode.lineperm.models.enums.LogResult;
 
@@ -83,10 +84,12 @@ public class LogsService {
     }
 
     public void userLogRefused() {
+        UserDAO userDAO = new UserDAO();
+
         System.out.print("Entrer le nom d'utilisateur : ");
         String user = scanner.nextLine();
 
-        if (!UserService.users.containsKey(user)) {
+        if (userDAO.findByUsername(user) == null) {
             System.out.println("Se utilisateur n'existe pas.");
             return;
         }
