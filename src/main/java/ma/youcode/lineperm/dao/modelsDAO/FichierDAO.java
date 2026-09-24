@@ -128,7 +128,7 @@ public class FichierDAO extends AbstractDAO<Fichier> {
             System.out.println("Error : " + e.getMessage());
         }
 
-        return fichiers;
+        return null;
     }
 
     public boolean updatePermissions(long id, String newPermissions) {
@@ -184,5 +184,39 @@ public class FichierDAO extends AbstractDAO<Fichier> {
         }
 
         return null;
-    } 
+    }
+    
+    public List<Fichier> getAll() {
+        String sql = "SELECT * FROM fichiers";
+        List<Fichier> fichiers = new ArrayList<>();
+
+        try (
+            Connection connection = AbstractDAO.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql , Statement.RETURN_GENERATED_KEYS)
+        ) {
+            UserDAO userDAO = new UserDAO();
+
+            try (ResultSet result = statement.executeQuery()) {
+                User owner = userDAO.findById(result.getLong("owener_id"));
+
+                if (owner == null) {
+                    System.out.println("User not exeste.");
+                    return fichiers;
+                }
+
+                while (result.next()) {
+                    fichiers.add(new Fichier(
+                        result.getLong("id"),
+                        result.getString("permissions"),
+                        owner,
+                        result.getString("file_name")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error : " + e.getMessage());
+        }
+
+        return null;
+    }
 }
