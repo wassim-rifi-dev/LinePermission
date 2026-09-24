@@ -112,7 +112,7 @@ public class FichierDAO extends AbstractDAO<Fichier> {
 
                 if (o == null) {
                     System.out.println("User not exeste.");
-                    return fichiers;
+                    return null;
                 }
 
                 while (result.next()) {
@@ -197,14 +197,14 @@ public class FichierDAO extends AbstractDAO<Fichier> {
             UserDAO userDAO = new UserDAO();
 
             try (ResultSet result = statement.executeQuery()) {
-                User owner = userDAO.findById(result.getLong("owener_id"));
-
-                if (owner == null) {
-                    System.out.println("User not exeste.");
-                    return fichiers;
-                }
-
                 while (result.next()) {
+                    User owner = userDAO.findById(result.getLong("owner_id"));
+
+                    if (owner == null) {
+                        System.out.println("User not exeste.");
+                        continue;
+                    }
+
                     fichiers.add(new Fichier(
                         result.getLong("id"),
                         result.getString("permissions"),
@@ -213,6 +213,8 @@ public class FichierDAO extends AbstractDAO<Fichier> {
                     ));
                 }
             }
+
+            return fichiers;
         } catch (SQLException e) {
             System.out.println("Error : " + e.getMessage());
         }

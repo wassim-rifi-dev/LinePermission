@@ -64,14 +64,12 @@ public class FileService {
     }
 
     public void ls() {
-        try {
-            Path filesFile = Path.of(FilePaths.filesFile);
+        FichierDAO fichierDAO = new FichierDAO();
 
-            String content = Files.readString(filesFile);
+        List<Fichier> fichiers = fichierDAO.getAll();
 
-            System.out.println(content);
-        }  catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
+        for (Fichier fichier : fichiers) {
+            System.out.println(fichier.getPermissions() + " " + fichier.getOwner().getUsername() + " " + fichier.getFileName());
         }
     }
 
