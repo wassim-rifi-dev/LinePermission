@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import ma.youcode.lineperm.constants.FilePaths;
+import ma.youcode.lineperm.dao.modelsDAO.FichierDAO;
 import ma.youcode.lineperm.models.Fichier;
 import ma.youcode.lineperm.models.Log;
 import ma.youcode.lineperm.models.User;
@@ -26,10 +27,12 @@ public class FileService {
 
     public void touch(String fileName) {
         try {
+            FichierDAO fichierDAO = new FichierDAO();
+
             Path logsFile = Path.of(FilePaths.LOGS_FILE);
             User currentUser = AuthService.currentUser;
 
-            if (UserService.files.containsKey(fileName)) {
+            if (fichierDAO.findByFileName(fileName) != null) {
                 System.out.println("Ce file est existe.");
 
                 String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + currentUser.getUsername() + ";" + LogType.CREATION + ";" + fileName + ";" + LogResult.REFUSE;
@@ -41,21 +44,19 @@ public class FileService {
                 return;
             }
 
-            Path filesFile = Path.of(FilePaths.filesFile);
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
 
-            String fileWriting = "rwd|--- " + currentUser.getUsername() + " " + fileName;
             String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + currentUser.getUsername() + ";" + LogType.CREATION + ";" + fileName + ";" + LogResult.OK;
 
             Files.createFile(filePath);
 
-            Files.writeString(filesFile , fileWriting + System.lineSeparator(), StandardOpenOption.APPEND);
+            Fichier newFichier = new Fichier("rwd|---", currentUser, fileName);
+            fichierDAO.save(newFichier);
+
             Files.writeString(logsFile , logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
 
-            Fichier fichierProtege = new Fichier("rwd|---", currentUser, fileName);
-            Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.CREATION, fichierProtege, LogResult.OK);
+            Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.CREATION, newFichier, LogResult.OK);
 
-            UserService.files.put(fileName, fichierProtege);
             UserService.logs.add(log);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());

@@ -33,6 +33,7 @@ public class FichierDAO extends AbstractDAO<Fichier> {
                     fichier.setId(id);
                 }
             }
+            System.out.println("Fichier creer en success.");
         } catch (SQLException e) {
             System.out.println("Error : " + e.getMessage());
         }
