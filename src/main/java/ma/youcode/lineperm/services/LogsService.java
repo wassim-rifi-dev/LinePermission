@@ -46,11 +46,7 @@ public class LogsService {
     }
 
     public void logsNumberByUser() {
-        Map<String, Long> logsNumberByUser = UserService.logs.stream()
-                                                            .collect(Collectors.groupingBy(
-                                                                log -> log.getUser().getUsername(),
-                                                                Collectors.counting()
-                                                            ));
+        Map<String, Long> logsNumberByUser = logDAO.logsNumberByUser();
 
         if (logsNumberByUser.isEmpty()) {
             System.out.println("Aucune utilisateurs a des activites.");

@@ -8,7 +8,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ma.youcode.lineperm.dao.AbstractDAO;
 import ma.youcode.lineperm.models.Log;
@@ -114,5 +116,31 @@ public class LogDAO extends AbstractDAO<Log> {
         }
 
         return users;
+    }
+
+    public Map<String, Long> logsNumberByUser() {
+        String sql = """
+                SELECT u.username, COUNT(l.id) AS nombre_logs
+                FROM users u
+                INNER JOIN logs l ON l.user_id = u.id
+                GROUP BY u.id, u.username;
+                """;
+
+        Map<String, Long> logsByUser = new HashMap<>();
+
+        try (
+            Connection connection = AbstractDAO.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet result = statement.executeQuery()
+        ) {
+            while (result.next()) {
+                logsByUser.put(result.getString("username"), result.getLong("nombre_logs"));
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error : " + e.getMessage());
+        }
+
+        return logsByUser;
     }
 }
