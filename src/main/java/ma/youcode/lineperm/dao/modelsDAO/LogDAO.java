@@ -60,7 +60,8 @@ public class LogDAO extends AbstractDAO<Log> {
         try (
                 Connection connection = AbstractDAO.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql);
-                ResultSet result = statement.executeQuery()) {
+                ResultSet result = statement.executeQuery()
+            ) {
             if (result.next()) {
                 return result.getLong(1);
             }
@@ -72,14 +73,18 @@ public class LogDAO extends AbstractDAO<Log> {
     }
 
     public long countRefusedLogTotal() {
-        String sql = "SELECT COUNT(*) FROM logs where result = REFUSE";
+        String sql = "SELECT COUNT(*) FROM logs where result = ?";
 
         try (
-                Connection connection = AbstractDAO.getConnection();
-                PreparedStatement statement = connection.prepareStatement(sql);
-                ResultSet result = statement.executeQuery()) {
-            if (result.next()) {
-                return result.getLong(1);
+            Connection connection = AbstractDAO.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+            statement.setString(1, "REFUSE");
+
+            try (ResultSet result = statement.executeQuery()) {
+                if (result.next()) {
+                    return result.getLong(1);
+                }
             }
         } catch (SQLException e) {
             System.out.println("Error : " + e.getMessage());
