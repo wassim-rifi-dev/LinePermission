@@ -91,9 +91,9 @@ public class LogsService {
     }
 
     public void actionByType() {
-        UserService.logs.stream()
-                    .collect(Collectors.groupingBy(Log::getType , Collectors.counting()))
-                    .entrySet()
+        LogDAO logDAO = new LogDAO();
+
+        logDAO.actionByType().entrySet()
                     .stream()
                     .forEach(log -> System.out.println("   - " + log.getKey() + " : " + log.getValue()));
     }

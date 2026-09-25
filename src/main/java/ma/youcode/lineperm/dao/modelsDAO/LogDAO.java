@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -213,5 +214,29 @@ public class LogDAO extends AbstractDAO<Log> {
         }
 
         return null;
+    }
+
+    public Map<String, Long> actionByType() {
+        String sql = """
+                SELECT type, COUNT(id) AS nombre_logs
+                FROM logs
+                GROUP BY type;
+                """;
+
+        Map<String, Long> logsByType = new LinkedHashMap<>();
+
+        try (
+                Connection connection = AbstractDAO.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql);
+                ResultSet result = statement.executeQuery()) {
+            while (result.next()) {
+                logsByType.put(result.getString("type"), result.getLong("nombre_logs"));
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error : " + e.getMessage());
+        }
+
+        return logsByType;
     }
 }
