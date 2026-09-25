@@ -126,11 +126,14 @@ public class FileService {
 
     public void nano(String fileName) {
         try {
+            FichierDAO fichierDAO = new FichierDAO();
+            Fichier fichier = fichierDAO.findByFileName(fileName);
+
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
             Path logsFile = Path.of(FilePaths.LOGS_FILE);
             User currentUser = AuthService.currentUser;
 
-            if (!UserService.files.containsKey(fileName)) {
+            if (fichier == null) {
                 System.out.println("Ce file n'existe pas.");
                 String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + currentUser.getUsername() + ";" + LogType.ECRITURE + ";" + fileName + ";" + LogResult.REFUSE;
                 Files.writeString(logsFile , logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
@@ -141,12 +144,8 @@ public class FileService {
                 return;
             }
 
-            Fichier fichier = UserService.files.get(fileName);
-            User fileOwner = fichier.getOwner();
-            String filePermission = fichier.getPermissions();
-
-            if (!fileOwner.getUsername().equals(currentUser.getUsername())) {
-                String[] permissionPart = filePermission.trim().split("\\|", 2);
+            if (!fichier.getOwner().getUsername().equals(currentUser.getUsername())) {
+                String[] permissionPart = fichier.getPermissions().trim().split("\\|", 2);
 
                 if (!permissionPart[1].contains("w")) {
                     String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + currentUser.getUsername() + ";" + LogType.ECRITURE + ";" + fileName + ";" + LogResult.REFUSE;
