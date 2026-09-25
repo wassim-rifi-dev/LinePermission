@@ -29,11 +29,12 @@ public class FileService {
     public void touch(String fileName) {
         try {
             FichierDAO fichierDAO = new FichierDAO();
+            Fichier fichier = fichierDAO.findByFileName(fileName);
 
             Path logsFile = Path.of(FilePaths.LOGS_FILE);
             User currentUser = AuthService.currentUser;
 
-            if (fichierDAO.findByFileName(fileName) != null) {
+            if (fichier != null) {
                 System.out.println("Ce file est existe.");
 
                 String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + currentUser.getUsername() + ";" + LogType.CREATION + ";" + fileName + ";" + LogResult.REFUSE;
@@ -77,12 +78,13 @@ public class FileService {
     public void cat(String fileName) {
         try {
             FichierDAO fichierDAO = new FichierDAO();
+            Fichier fichier = fichierDAO.findByFileName(fileName);
 
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
             Path logsFile = Path.of(FilePaths.LOGS_FILE);
             User currentUser = AuthService.currentUser;
 
-            if (fichierDAO.findByFileName(fileName) == null) {
+            if (fichier == null) {
                 System.out.println("Ce file n'existe pas.");
 
                 String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + currentUser.getUsername() + ";" + LogType.CREATION + ";" + fileName + ";" + LogResult.REFUSE;
@@ -93,8 +95,6 @@ public class FileService {
 
                 return;
             }
-
-            Fichier fichier = fichierDAO.findByFileName(fileName);
 
             if (!fichier.getOwner().getUsername().equals(currentUser.getUsername())) {
                 String[] permissionPart = fichier.getPermissions().trim().split("\\|", 2);
