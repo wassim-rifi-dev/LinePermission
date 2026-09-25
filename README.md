@@ -1,13 +1,15 @@
-# LinePermission
+# Line Permission
 
-**LinePermission** est une application console Java qui reproduit, de manière simplifiée, le système de gestion des utilisateurs, fichiers et permissions d'un système Linux.
+**Line Permission** est une application console développée en Java qui propose une gestion simplifiée des utilisateurs, des fichiers, des permissions et des journaux d'activité.
 
-Le projet est construit progressivement autour de deux parties :
+Le projet est organisé en plusieurs couches afin de séparer les responsabilités :
 
-1. **Compte et session** — création de comptes, connexion et déconnexion.
-2. **Fichiers et permissions** — création, lecture, modification, suppression et partage de droits.
+* les **DAO** assurent l'accès aux données ;
+* les **services** contiennent la logique métier ;
+* les **modèles** représentent les données manipulées ;
+* la couche **UI** gère les interactions avec l'utilisateur via la console.
 
-L'objectif est également de mettre en pratique les principes de **programmation orientée objet**, de **séparation des responsabilités**, de **persistance des données** et de **contrôle d'accès**.
+Les données applicatives sont persistées dans une base de données **SQLite**.
 
 ---
 
@@ -16,999 +18,857 @@ L'objectif est également de mettre en pratique les principes de **programmation
 * [Présentation](#-présentation)
 * [Fonctionnalités](#-fonctionnalités)
 * [Modèle de permissions](#-modèle-de-permissions)
-* [Commandes](#-commandes)
 * [Architecture](#-architecture)
-* [Persistance](#-persistance)
-* [Sécurité](#-sécurité)
-* [Technologies](#-technologies)
 * [Structure du projet](#-structure-du-projet)
+* [Base de données](#-base-de-données)
+* [Technologies utilisées](#-technologies-utilisées)
+* [Prérequis](#-prérequis)
 * [Installation](#-installation)
-* [Compilation](#-compilation)
-* [Exécution](#-exécution)
-* [Exemple d'utilisation](#-exemple-dutilisation)
-* [Règles importantes](#-règles-importantes)
-* [Compétences mises en pratique](#-compétences-mises-en-pratique)
+* [Compilation et exécution](#-compilation-et-exécution)
+* [Utilisation](#-utilisation)
+* [Statistiques et logs](#-statistiques-et-logs)
+* [Limites actuelles](#-limites-actuelles)
 
 ---
 
-## 📝 Présentation
+## 📌 Présentation
 
-Sur un véritable système Linux, chaque fichier possède :
+Line Permission simule un système simplifié de gestion de fichiers et de permissions.
 
+Chaque fichier possède :
+
+* un nom ;
 * un propriétaire ;
-* des permissions ;
-* un contenu ;
-* des règles déterminant qui peut accéder au fichier.
+* un ensemble de permissions ;
+* un contenu stocké dans le système de fichiers.
 
-**LinePermission** reproduit ce fonctionnement avec un modèle volontairement simplifié.
+Les actions réalisées dans l'application sont également enregistrées dans une base SQLite sous forme de **logs**.
 
-Il existe seulement **deux catégories d'utilisateurs** :
+Le projet utilise notamment :
 
-| Catégorie    | Signification                     |
-| ------------ | --------------------------------- |
-| Propriétaire | Utilisateur ayant créé le fichier |
-| Autres       | Tous les autres utilisateurs      |
+```text
+User
+Fichier
+Log
+```
 
-Il existe également **trois droits** :
-
-| Droit | Signification        |
-| ----- | -------------------- |
-| `r`   | Lire le contenu      |
-| `w`   | Modifier le contenu  |
-| `d`   | Supprimer le fichier |
+pour représenter les principales données métier.
 
 ---
 
-# 🔐 Modèle de permissions
+## ✨ Fonctionnalités
 
-Les permissions sont affichées sous la forme :
+### Gestion des utilisateurs
+
+L'application permet de :
+
+* créer un compte avec `signup` ;
+* se connecter avec `login` ;
+* se déconnecter avec `logout` ;
+* vérifier l'existence d'un utilisateur ;
+* stocker les mots de passe sous forme de hash BCrypt.
+
+Les utilisateurs sont stockés dans la table SQLite `users`.
+
+---
+
+### Gestion des fichiers
+
+Une fois connecté, l'utilisateur peut :
+
+* créer un fichier avec `touch` ;
+* afficher la liste des fichiers avec `ls` ;
+* lire le contenu d'un fichier avec `cat` ;
+* modifier le contenu avec `nano` ;
+* modifier les permissions avec `chmod`.
+
+Les fichiers physiques sont créés dans le dossier :
+
+```text
+files/
+```
+
+Les métadonnées des fichiers sont enregistrées dans la table SQLite `fichiers`.
+
+---
+
+### Gestion des permissions
+
+Les permissions utilisent trois droits :
+
+| Droit | Signification           |
+| ----- | ----------------------- |
+| `r`   | Lecture                 |
+| `w`   | Écriture / modification |
+| `d`   | Suppression             |
+
+Les permissions sont représentées sous la forme :
 
 ```text
 PROPRIETAIRE|AUTRES
 ```
 
-Chaque bloc possède toujours trois positions :
-
-```text
-rwd
-```
-
-Un `-` indique que le droit n'est pas accordé.
-
-### Exemples
+Par exemple :
 
 ```text
 rwd|---
 ```
 
-Le propriétaire possède tous les droits et les autres n'en possèdent aucun.
+signifie que le propriétaire possède les trois droits tandis que les autres utilisateurs n'ont aucun droit.
+
+Lors de la création d'un fichier, le code initialise ses permissions à :
 
 ```text
-rw-|r--
+rwd|---
 ```
 
-Le propriétaire peut lire et écrire.
-
-Les autres peuvent uniquement lire.
-
-```text
-rwd|r--
-```
-
-Le propriétaire possède tous les droits.
-
-Les autres peuvent uniquement lire.
+Le propriétaire dispose donc initialement de tous les droits et les autres utilisateurs d'aucun droit.
 
 ---
 
-## ⚠️ Règle fondamentale
+## 🏗️ Architecture
 
-**Une seule catégorie de permissions s'applique à un utilisateur.**
-
-Si l'utilisateur connecté est le propriétaire :
+Le projet suit une organisation en couches.
 
 ```text
-→ seuls les droits du bloc propriétaire sont utilisés.
+                    ┌──────────────────┐
+                    │    ConsoleApp    │
+                    │   Interface CLI  │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │     Services     │
+                    │                  │
+                    │ AuthService      │
+                    │ FileService      │
+                    │ LogsService      │
+                    │ DAOService       │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │       DAO        │
+                    │                  │
+                    │ AbstractDAO      │
+                    │ UserDAO          │
+                    │ FichierDAO       │
+                    │ LogDAO           │
+                    └────────┬─────────┘
+                             │
+                             ▼
+                    ┌──────────────────┐
+                    │     SQLite       │
+                    │   lineperm.db    │
+                    └──────────────────┘
 ```
 
-Sinon :
+### Couche UI
+
+`ConsoleApp` gère les interactions avec l'utilisateur :
 
 ```text
-→ seuls les droits du bloc autres sont utilisés.
+src/main/java/ma/youcode/lineperm/ui/
+└── ConsoleApp.java
 ```
 
-Il n'y a **aucune notion de groupe ou d'administrateur**.
-
----
-
-# 🚀 Fonctionnalités
-
-## Partie 1 — Comptes et sessions
-
-LinePermission permet de :
-
-* créer un compte ;
-* protéger le compte avec un mot de passe ;
-* se connecter ;
-* se déconnecter ;
-* conserver les comptes après redémarrage ;
-* empêcher les doublons de login.
-
-Commandes :
+Elle interprète notamment les commandes :
 
 ```text
 signup
 login
 logout
-exit
-```
-
----
-
-## Partie 2 — Fichiers et permissions
-
-Une fois connecté, l'utilisateur peut :
-
-* créer un fichier ;
-* lister les fichiers ;
-* afficher le contenu d'un fichier ;
-* modifier un fichier ;
-* supprimer un fichier ;
-* modifier les permissions de partage.
-
-Commandes :
-
-```text
 ls
 touch
 cat
 nano
 chmod
+stats
+exit
 ```
 
 ---
 
-# 💻 Commandes
+### Couche Services
 
-## `signup`
-
-Crée un nouveau compte.
+Les services contiennent la logique métier.
 
 ```text
-linperm> signup
-Login: abdelaziz
-Password:
+services/
+├── AuthService.java
+├── DAOService.java
+├── FileService.java
+└── LogsService.java
 ```
 
-Le mot de passe n'est jamais sauvegardé en clair.
+#### `AuthService`
 
-### Contraintes
+Responsable notamment de :
 
-Un login :
+* l'inscription ;
+* la connexion ;
+* la déconnexion ;
+* la gestion de l'utilisateur courant ;
+* le hash des mots de passe avec BCrypt.
 
-* ne doit pas être vide ;
-* ne doit pas contenir d'espace ;
-* ne doit pas contenir `:` ;
-* doit être unique.
+#### `FileService`
 
----
+Gère les opérations liées aux fichiers :
 
-## `login`
+* création ;
+* lecture ;
+* modification ;
+* consultation ;
+* modification des permissions.
 
-Permet de se connecter avec un compte existant.
+#### `LogsService`
 
-```text
-linperm> login
-Login: abdelaziz
-Password:
-```
+Expose les fonctionnalités de consultation des statistiques enregistrées dans les logs.
 
-Après une connexion réussie, l'invite devient :
+#### `DAOService`
 
-```text
-abdelaziz@linperm>
-```
-
-Un login inexistant et un mauvais mot de passe retournent exactement le même message afin de ne pas révéler l'existence des comptes.
-
----
-
-## `logout`
-
-Ferme la session actuelle.
+Initialise les tables SQLite :
 
 ```text
-abdelaziz@linperm> logout
-linperm>
-```
-
-La commande est refusée si aucun utilisateur n'est connecté.
-
----
-
-## `exit`
-
-Quitte l'application.
-
-```text
-linperm> exit
+users
+fichiers
+logs
 ```
 
 ---
 
-# 📁 Commandes fichiers
+## 🗄️ Couche DAO
 
-## `touch`
-
-Crée un nouveau fichier.
+Les DAO encapsulent l'accès à la base de données.
 
 ```text
-abdelaziz@linperm> touch test.txt
+dao/
+├── AbstractDAO.java
+├── DAO.java
+└── modelsDAO/
+    ├── UserDAO.java
+    ├── FichierDAO.java
+    └── LogDAO.java
 ```
 
-Le créateur devient automatiquement propriétaire du fichier.
+### `AbstractDAO`
 
-Les permissions initiales sont :
+La classe `AbstractDAO<T>` fournit la connexion SQLite utilisée par les DAO.
 
-```text
-rwd|---
+La connexion est configurée avec :
+
+```java
+jdbc:sqlite:src/main/resources/data/lineperm.db
 ```
 
-Les autres utilisateurs n'ont donc aucun droit sur le nouveau fichier.
+### `DAO<T>`
 
-### Exemple
+L'interface définit notamment les opérations :
 
-```text
-abdelaziz@linperm> touch notes.txt
-File created.
+```java
+void save(T t);
+T findById(long id);
+boolean delete(T t);
 ```
 
-Un nom contenant un chemin est refusé :
+### `UserDAO`
 
-```text
-touch ../secret.txt
-```
+Gère les utilisateurs en base de données.
 
-ou :
+### `FichierDAO`
 
-```text
-touch documents/test.txt
-```
+Gère les fichiers et leurs métadonnées.
+
+### `LogDAO`
+
+Gère les journaux et fournit plusieurs requêtes statistiques.
 
 ---
 
-## `ls`
+## 📂 Structure du projet
 
-Liste les fichiers disponibles.
-
-```text
-abdelaziz@linperm> ls
-```
-
-L'utilisateur peut voir les fichiers des autres utilisateurs, même s'il n'a aucun droit dessus.
-
-### `ls -l`
-
-Affiche les permissions et le propriétaire :
+La structure principale du code est :
 
 ```text
-abdelaziz@linperm> ls -l
-
-rwd|--- abdelaziz notes.txt
-rw-|r-- karim project.txt
-r--|r-- sara readme.txt
-```
-
-La visibilité d'un fichier dans `ls` ne dépend donc pas du droit `r`.
-
----
-
-# 📖 `cat`
-
-Affiche le contenu d'un fichier.
-
-```text
-abdelaziz@linperm> cat notes.txt
-Bonjour LinePermission !
-```
-
-La commande nécessite le droit :
-
-```text
-r
-```
-
-Si l'utilisateur ne possède pas ce droit :
-
-```text
-Permission denied
-```
-
-Le contenu n'est alors pas affiché.
-
----
-
-# ✏️ `nano`
-
-Permet de modifier le contenu d'un fichier.
-
-```text
-abdelaziz@linperm> nano notes.txt
-```
-
-La commande nécessite le droit :
-
-```text
-w
-```
-
-Si le droit `w` est absent :
-
-```text
-Permission denied
-```
-
-Le fichier n'est pas modifié.
-
-### Cas particulier : `w` sans `r`
-
-Un utilisateur peut avoir :
-
-```text
--w-
-```
-
-sans avoir :
-
-```text
-r--
-```
-
-Dans ce cas, `nano` permet tout de même la modification, mais **le contenu actuel ne doit pas être affiché**.
-
-L'utilisateur édite donc le fichier « à l'aveugle ».
-
-Cela empêche `nano` de devenir un moyen indirect de contourner le droit de lecture.
-
----
-
-# 🔧 `chmod`
-
-Permet au propriétaire de partager des droits avec les autres utilisateurs.
-
-Exemple :
-
-```text
-abdelaziz@linperm> chmod +r notes.txt
-```
-
-Les autres utilisateurs obtiennent alors le droit de lecture.
-
-Le propriétaire peut également partager :
-
-```text
-chmod +w notes.txt
-chmod +d notes.txt
-```
-
-Plusieurs droits peuvent être utilisés selon l'implémentation prévue par le projet.
-
-### Exemple
-
-Avant :
-
-```text
-rwd|---
-```
-
-Après :
-
-```text
-rwd|r--
-```
-
-Le propriétaire reste :
-
-```text
-rwd
-```
-
-Seul le bloc `autres` peut être modifié par `chmod`.
-
----
-
-## 🔒 Qui peut utiliser `chmod` ?
-
-**Seul le propriétaire du fichier.**
-
-Si un autre utilisateur tente :
-
-```text
-chmod +w notes.txt
-```
-
-le résultat est :
-
-```text
-Permission denied
-```
-
----
-
-# 🗂️ Architecture
-
-Le projet respecte une architecture en couches :
-
-```text
-┌──────────────────────┐
-│    ConsoleApp        │
-│  Interface utilisateur│
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│     Services         │
-│ UserService          │
-│ FileService          │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│   ControleAcces      │
-│ Permissions / accès  │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│       Model          │
-│ User / FichierProtege│
-└──────────────────────┘
-```
-
-### Principe
-
-Chaque couche possède une responsabilité précise.
-
-* `ConsoleApp` affiche les informations et récupère les commandes.
-* `UserService` gère les comptes et les sessions.
-* `FileService` gère les fichiers et applique les contrôles d'accès.
-* `ControleAcces` décide si une opération est autorisée.
-* Les classes du package `model` représentent les données.
-
----
-
-# 🧱 Structure du projet
-
-```text
-LinePermission/
+line-permission/
+│
+├── files/
+│   ├── rifi.txt
+│   └── test.txt
 │
 ├── lib/
-│   └── jbcrypt-*.jar
-│
-├── data/
-│   ├── users.txt
-│   └── files/
-│       ├── notes.txt
-│       ├── project.txt
-│       └── ...
+│   ├── jbcrypt-0.4.jar
+│   └── sqlite-jdbc-3.53.4.0.jar
 │
 ├── src/
-│   ├── Main.java
-│   │
-│   ├── model/
-│   │   ├── User.java
-│   │   └── FichierProtege.java
-│   │
-│   ├── access/
-│   │   └── ControleAcces.java
-│   │
-│   ├── service/
-│   │   ├── UserService.java
-│   │   └── FileService.java
-│   │
-│   └── ui/
-│       └── ConsoleApp.java
+│   └── main/
+│       ├── java/
+│       │   └── ma/
+│       │       └── youcode/
+│       │           └── lineperm/
+│       │               ├── constants/
+│       │               │   └── FilePaths.java
+│       │               │
+│       │               ├── dao/
+│       │               │   ├── AbstractDAO.java
+│       │               │   ├── DAO.java
+│       │               │   └── modelsDAO/
+│       │               │       ├── FichierDAO.java
+│       │               │       ├── LogDAO.java
+│       │               │       └── UserDAO.java
+│       │               │
+│       │               ├── models/
+│       │               │   ├── Fichier.java
+│       │               │   ├── Log.java
+│       │               │   ├── User.java
+│       │               │   └── enums/
+│       │               │       ├── LogResult.java
+│       │               │       └── LogType.java
+│       │               │
+│       │               ├── services/
+│       │               │   ├── AuthService.java
+│       │               │   ├── DAOService.java
+│       │               │   ├── FileService.java
+│       │               │   └── LogsService.java
+│       │               │
+│       │               ├── ui/
+│       │               │   └── ConsoleApp.java
+│       │               │
+│       │               └── LinePermissionMain.java
+│       │
+│       └── resources/
+│           └── data/
+│               └── lineperm.db
 │
-└── README.md
+└── lib/
 ```
+
+Le dépôt contient également un dossier `target/` correspondant à des fichiers compilés.
 
 ---
 
-# 💾 Persistance
+## 🗃️ Base de données
 
-Les données doivent survivre au redémarrage de l'application.
+Line Permission utilise **SQLite**.
 
-## Comptes
-
-Les comptes sont sauvegardés dans un fichier texte.
-
-Format :
+La base est configurée dans `AbstractDAO` avec :
 
 ```text
-login:hash
+src/main/resources/data/lineperm.db
 ```
 
-Exemple :
+Les tables sont créées par `DAOService`.
+
+### Table `users`
+
+Elle contient notamment :
 
 ```text
-abdelaziz:$2a$10$...
-karim:$2a$10$...
+id
+username
+password
 ```
 
-Le mot de passe réel n'est jamais présent dans le fichier.
+Le `username` est unique.
 
 ---
 
-## Fichiers
+### Table `fichiers`
 
-Les métadonnées des fichiers sont sauvegardées avec une ligne par fichier.
-
-Format :
+Elle contient :
 
 ```text
-nom;proprietaire;rwd;r--
+id
+permissions
+owner_id
+file_name
 ```
 
-Exemple :
+`owner_id` référence l'utilisateur propriétaire.
+
+---
+
+### Table `logs`
+
+Elle contient notamment :
 
 ```text
-notes.txt;abdelaziz;rwd;r--
+id
+log_date
+log_time
+user_id
+type
+file_id
+result
 ```
 
-Le contenu du fichier est stocké séparément dans le dossier :
+Les relations avec les utilisateurs et les fichiers sont définies avec des clés étrangères.
+
+---
+
+## 📊 Logs
+
+Les actions réalisées sur les fichiers peuvent être enregistrées dans la table `logs`.
+
+Les types définis dans `LogType` sont :
 
 ```text
-data/
+CREATION
+LECTURE
+ECRITURE
+CHANGE_PERMISSION
+SUPPRESSION
 ```
 
-Cela permet notamment de gérer correctement les contenus contenant plusieurs lignes.
-
----
-
-# 🔐 Sécurité
-
-## Hash des mots de passe
-
-LinePermission utilise **jBCrypt** pour protéger les mots de passe.
-
-Lors de l'inscription :
-
-```java
-BCrypt.gensalt()
-BCrypt.hashpw()
-```
-
-Lors de la connexion :
-
-```java
-BCrypt.checkpw()
-```
-
-Le mot de passe en clair n'est donc jamais sauvegardé.
-
----
-
-## Protection contre l'énumération des comptes
-
-Les deux situations suivantes doivent produire le même message :
+Les résultats possibles sont :
 
 ```text
-Login inconnu
+OK
+REFUSE
 ```
 
-et :
+Les logs sont associés à un utilisateur et, lorsqu'il est disponible, à un fichier.
+
+---
+
+## 📈 Statistiques
+
+La commande `stats` est disponible avant connexion.
+
+Elle propose actuellement :
 
 ```text
-Mot de passe incorrect
+1) Nombre total d'actions
+2) Nombre d'acces refuses
+3) Utilisateurs distincts
+4) Actions par utilisateur
+5) Top 3 des fichiers consultes
+6) Acces refuses d'un utilisateur
+7) Utilisateur le plus actif
+8) Repartition des action par type
+0) Quitter
 ```
 
-L'utilisateur doit recevoir un message générique, par exemple :
-
-```text
-Invalid credentials
-```
-
-Cela évite de révéler si un login existe.
+Ces informations sont calculées directement depuis la base SQLite par `LogDAO`.
 
 ---
 
-# 🛡️ Contrôle d'accès
+## 🛠️ Technologies utilisées
 
-Le contrôle d'accès est centralisé dans :
-
-```text
-access/ControleAcces.java
-```
-
-Cette classe ne possède aucun état et fournit des méthodes `static`.
-
-Elle détermine notamment si un utilisateur peut :
-
-* lire ;
-* écrire ;
-* supprimer ;
-* modifier les permissions.
-
-Exemple conceptuel :
-
-```java
-ControleAcces.estAutorise(user, fichier, 'r');
-```
-
-Le `FileService` doit effectuer le contrôle avant toute opération sensible.
-
----
-
-# ⚙️ Règles importantes
-
-### Avant connexion
-
-Aucune commande de gestion de fichiers n'est accessible.
-
-```text
-linperm> ls
-Permission denied
-```
-
-L'utilisateur doit d'abord faire :
-
-```text
-login
-```
-
----
-
-### Pas de reconnexion pendant une session
-
-Si un utilisateur est déjà connecté :
-
-```text
-signup
-login
-```
-
-sont refusés.
-
-Il faut d'abord :
-
-```text
-logout
-```
-
----
-
-### Aucun administrateur
-
-Il n'existe pas de compte administrateur.
-
-Sur le fichier d'un autre utilisateur, tout utilisateur est simplement considéré comme :
-
-```text
-autres
-```
-
----
-
-### `ls` ne nécessite pas de permission
-
-Un utilisateur peut voir l'existence et les informations d'un fichier même s'il ne possède aucun droit dessus.
-
----
-
-### `cat` nécessite `r`
-
-Posséder `w` ne donne pas automatiquement `r`.
-
----
-
-### `nano` nécessite `w`
-
-Posséder `r` ne donne pas automatiquement `w`.
-
----
-
-### `chmod` appartient au propriétaire
-
-Seul le propriétaire peut modifier le bloc `autres`.
-
----
-
-### Les permissions du propriétaire ne changent jamais avec `chmod`
-
-`chmod` agit uniquement sur :
-
-```text
-AUTRES
-```
-
----
-
-### Les fichiers ne peuvent pas sortir du dossier de données
-
-Les noms contenant un chemin sont interdits afin d'éviter d'écrire en dehors du dossier prévu.
-
----
-
-# 🧪 Critères d'acceptation
-
-## Partie 1
-
-* [x] Un compte ne peut pas être créé en double.
-* [x] Le mot de passe n'est jamais stocké en clair.
-* [x] Un mauvais mot de passe et un login inexistant donnent le même message.
-* [x] Aucune commande fichier n'est accessible avant connexion.
-* [x] L'invite change après connexion.
-* [x] Une ligne vide ne provoque pas d'erreur Java.
-* [x] Une commande inconnue ne provoque pas d'erreur Java.
-* [x] Les comptes survivent au redémarrage.
-* [x] Le premier lancement sans fichier de sauvegarde fonctionne.
-
-## Partie 2
-
-* [x] Un nouveau fichier possède initialement `rwd|---`.
-* [x] Le créateur devient propriétaire.
-* [x] `ls -l` affiche les permissions et le propriétaire.
-* [x] Les fichiers des autres restent visibles.
-* [x] `cat` nécessite `r`.
-* [x] `nano` nécessite `w`.
-* [x] `w` sans `r` permet l'édition à l'aveugle.
-* [x] Seul le propriétaire peut utiliser `chmod`.
-* [x] `chmod` ne modifie que le bloc `autres`.
-* [x] Une permission déjà accordée peut être redonnée sans bloquer l'application.
-* [x] Un nom de fichier contenant un chemin est refusé.
-* [x] Les permissions survivent au redémarrage.
-* [x] Les contenus survivent au redémarrage.
-
----
-
-# 🛠️ Technologies
+Le projet utilise :
 
 * **Java**
-* **Java Collections**
-* **Java NIO (`java.nio.file`)**
+* **SQLite**
+* **JDBC**
 * **jBCrypt**
+* **Java NIO**
+* **Java Collections**
 * **Programmation orientée objet**
-* **Console / CLI**
-* **Persistance dans des fichiers texte**
+
+Les bibliothèques présentes dans le projet sont :
+
+```text
+lib/jbcrypt-0.4.jar
+lib/sqlite-jdbc-3.53.4.0.jar
+```
+
+Aucun fichier `pom.xml` ou `build.gradle` n'est présent dans le projet fourni. La compilation doit donc être réalisée avec les bibliothèques `.jar` présentes dans `lib/`.
 
 ---
 
-# 📦 Installation
+## 📋 Prérequis
 
-## 1. Cloner le projet
+Pour compiler et exécuter le projet, il faut disposer de :
+
+1. un **JDK Java** ;
+2. les deux bibliothèques présentes dans `lib/` :
+
+   * `jbcrypt-0.4.jar`
+   * `sqlite-jdbc-3.53.4.0.jar`
+
+Il est également recommandé d'exécuter l'application depuis la racine du projet, car les chemins utilisés par le code sont relatifs.
+
+---
+
+## 📥 Installation
+
+### 1. Récupérer le projet
 
 ```bash
 git clone <URL_DU_REPOSITORY>
-cd LinePermission
+cd line-permission
 ```
 
-## 2. Vérifier Java
+Ou ouvrir directement le projet dans votre IDE Java.
+
+### 2. Vérifier les bibliothèques
+
+Le dossier `lib/` doit contenir :
+
+```text
+lib/
+├── jbcrypt-0.4.jar
+└── sqlite-jdbc-3.53.4.0.jar
+```
+
+### 3. Vérifier Java
 
 ```bash
 java -version
 javac -version
 ```
 
-Le projet utilise les fonctionnalités Java standard telles que :
-
-* `Path`
-* `Files`
-* `List`
-* `ArrayList`
-* `HashMap`
-* `StringBuilder`
+Aucune version précise du JDK n'est déclarée dans les fichiers du projet fournis ; il est donc préférable d'utiliser une version compatible avec le code Java présent dans le dépôt.
 
 ---
 
-## 3. Ajouter jBCrypt
+## ▶️ Compilation et exécution
 
-Placer le fichier `.jar` de jBCrypt dans :
-
-```text
-lib/
-```
-
-Exemple :
-
-```text
-lib/jbcrypt-0.4.jar
-```
-
----
-
-# 🔨 Compilation
-
-Depuis la racine du projet :
+Le projet ne contient pas de système de build Maven ou Gradle. Les commandes ci-dessous utilisent donc directement `javac` et les JAR présents dans `lib/`.
 
 ### Linux / macOS
 
+Depuis la racine du projet :
+
 ```bash
-javac -cp "lib/jbcrypt-0.4.jar" -d out $(find src -name "*.java")
+mkdir -p out
+javac -cp "lib/*" -d out $(find src/main/java -name "*.java")
+```
+
+Puis :
+
+```bash
+java -cp "out:lib/*" ma.youcode.lineperm.LinePermissionMain
 ```
 
 ### Windows PowerShell
 
 ```powershell
-javac -cp "lib/jbcrypt-0.4.jar" -d out (Get-ChildItem -Recurse src -Filter *.java).FullName
+mkdir out
+javac -cp "lib/*" -d out (Get-ChildItem -Recurse src/main/java -Filter *.java).FullName
 ```
 
----
-
-# ▶️ Exécution
-
-### Linux / macOS
-
-```bash
-java -cp "out:lib/jbcrypt-0.4.jar" Main
-```
-
-### Windows
+Puis :
 
 ```powershell
-java -cp "out;lib/jbcrypt-0.4.jar" Main
+java -cp "out;lib/*" ma.youcode.lineperm.LinePermissionMain
 ```
 
-> L'application doit être lancée depuis la **racine du projet**, car les chemins vers `data/` sont relatifs au répertoire courant.
+Le point d'entrée de l'application est :
+
+```java
+ma.youcode.lineperm.LinePermissionMain
+```
 
 ---
 
-# 🖥️ Exemple d'utilisation
+## 💻 Utilisation
+
+Au démarrage, l'application affiche une invite similaire à :
 
 ```text
-linperm> signup
-Login: abdelaziz
-Password:
-Account created.
+====================== LinePerm ====================
+Non Connecte ? Commandes : signup | login | stats | help | exit
 
-linperm> login
-Login: abdelaziz
-Password:
-Login successful.
-
-abdelaziz@linperm> touch notes.txt
-File created.
-
-abdelaziz@linperm> ls -l
-rwd|--- abdelaziz notes.txt
-
-abdelaziz@linperm> cat notes.txt
-
-abdelaziz@linperm> nano notes.txt
-...
-
-abdelaziz@linperm> chmod +r notes.txt
-Permission shared.
-
-abdelaziz@linperm> logout
-linperm> exit
+lineperm>
 ```
 
----
-
-# 📚 Compétences mises en pratique
-
-## Java
-
-* `String`
-* `boolean`
-* `char`
-* `String[]`
-* `if / else`
-* opérateurs logiques
-* `while`
-* `switch`
-* `return`
-* `null`
-* méthodes `static`
-* surcharge de constructeurs
-* `this(...)`
-* opérateur ternaire
-
-## Programmation orientée objet
-
-* Classes
-* Attributs `private`
-* Constructeurs
-* Encapsulation
-* Getters
-* Attributs `final`
-* Packages
-* Séparation des responsabilités
-
-## Collections
-
-* `Map`
-* `HashMap`
-* `List`
-* `ArrayList`
-* `put`
-* `get`
-* `containsKey`
-* `values`
-* boucle `for-each`
-
-## Manipulation des chaînes
-
-* `trim()`
-* `isEmpty()`
-* `equals()`
-* `toLowerCase()`
-* `contains()`
-* `split()`
-* `charAt()`
-* `substring()`
-* `startsWith()`
-* concaténation
-
-## Fichiers
-
-* `Path`
-* `Path.resolve()`
-* `Files.exists()`
-* `Files.readAllLines()`
-* `Files.write()`
-* `Files.readString()`
-* `Files.writeString()`
-* `try / catch`
-* gestion des `IOException`
-
-## Sécurité
-
-* Hashage des mots de passe avec BCrypt
-* Vérification des identifiants
-* Contrôle d'accès
-* Séparation propriétaire / autres
-* Protection contre les accès non autorisés
-
----
-
-# 🏗️ Principes de conception
-
-LinePermission applique plusieurs principes importants :
-
-### Une classe = une responsabilité
+### Créer un compte
 
 ```text
-User                → représente un compte
-FichierProtege      → représente un fichier et ses permissions
-ControleAcces       → décide si un accès est autorisé
-UserService         → gère les utilisateurs
-FileService         → gère les fichiers
-ConsoleApp          → gère l'interaction avec l'utilisateur
+lineperm> signup
+Entrer votre information.
+username : wassim
+password : ****
 ```
 
-### Séparation des couches
+Le mot de passe est hashé avec BCrypt avant son enregistrement.
 
-La logique d'affichage reste dans `ConsoleApp`.
-
-La logique métier reste dans les services.
-
-La décision d'autorisation reste dans `ControleAcces`.
-
-Le modèle ne connaît pas les services et ne fait aucun affichage.
+Après une inscription réussie, l'utilisateur est directement considéré comme connecté.
 
 ---
 
-# 🎯 Objectif pédagogique
-
-Ce projet a pour objectif de construire progressivement une application Java complète en console tout en découvrant des notions fondamentales :
+### Se connecter
 
 ```text
-Java
- ↓
-POO
- ↓
-Collections
- ↓
-Fichiers
- ↓
-Persistance
- ↓
-Authentification
- ↓
-Contrôle d'accès
- ↓
-Architecture en couches
+lineperm> login
+Entrer votre information.
+username : wassim
+password : ****
 ```
 
-LinePermission permet ainsi de comprendre concrètement comment les concepts de **session, authentification, permissions et persistance** peuvent être combinés dans une application réelle.
+En cas de connexion réussie, l'invite utilise le nom de l'utilisateur :
+
+```text
+wassim@lineperm>
+```
+
+---
+
+### Créer un fichier
+
+```text
+wassim@lineperm> touch test.txt
+```
+
+Le fichier physique est créé dans :
+
+```text
+files/
+```
+
+Ses métadonnées sont enregistrées dans SQLite.
+
+---
+
+### Lister les fichiers
+
+```text
+wassim@lineperm> ls
+```
+
+Le code affiche pour chaque fichier :
+
+```text
+permissions propriétaire nom_du_fichier
+```
+
+Par exemple :
+
+```text
+rwd|--- wassim test.txt
+```
+
+---
+
+### Lire un fichier
+
+```text
+wassim@lineperm> cat test.txt
+```
+
+Pour un utilisateur qui n'est pas propriétaire, le code vérifie la présence du droit `r` dans la partie `AUTRES`.
+
+---
+
+### Modifier un fichier
+
+```text
+wassim@lineperm> nano test.txt
+```
+
+Le programme affiche le contenu actuel puis permet d'ajouter des lignes.
+
+La saisie se termine avec :
+
+```text
+EOF
+```
+
+Pour un utilisateur qui n'est pas propriétaire, le droit `w` est vérifié avant la modification.
+
+---
+
+### Modifier les permissions
+
+Le propriétaire peut utiliser `chmod`.
+
+Exemple :
+
+```text
+wassim@lineperm> chmod +r test.txt
+```
+
+Les permissions peuvent également être retirées avec la syntaxe utilisant `-`, par exemple :
+
+```text
+wassim@lineperm> chmod -r test.txt
+```
+
+Le code actuel applique ces modifications au bloc des permissions des **autres utilisateurs**.
+
+---
+
+### Se déconnecter
+
+```text
+wassim@lineperm> logout
+```
+
+La session courante est supprimée.
+
+---
+
+### Quitter
+
+Depuis l'invite non authentifiée :
+
+```text
+lineperm> exit
+```
+
+---
+
+## 🔐 Sécurité
+
+Les mots de passe ne sont pas stockés directement en clair.
+
+`AuthService` utilise :
+
+```java
+BCrypt.hashpw(...)
+```
+
+lors de l'inscription et :
+
+```java
+BCrypt.checkpw(...)
+```
+
+lors de la connexion.
+
+La base de données contient donc le hash du mot de passe plutôt que le mot de passe fourni lors de l'inscription.
+
+---
+
+## 🧩 Principes d'organisation
+
+Le projet met en pratique une séparation claire des responsabilités :
+
+```text
+UI
+ │
+ ▼
+Services
+ │
+ ▼
+DAO
+ │
+ ▼
+SQLite
+```
+
+Les modèles restent indépendants de la logique d'accès aux données :
+
+```text
+models/
+├── User
+├── Fichier
+└── Log
+```
+
+Les DAO s'occupent de la persistance :
+
+```text
+dao/
+├── AbstractDAO
+├── UserDAO
+├── FichierDAO
+└── LogDAO
+```
+
+Les services orchestrent la logique applicative :
+
+```text
+services/
+├── AuthService
+├── FileService
+├── LogsService
+└── DAOService
+```
+
+---
+
+## ⚠️ Limites actuelles
+
+Cette section reflète volontairement ce qui est présent dans le code fourni.
+
+### Suppression des fichiers
+
+Le modèle de permissions contient le droit :
+
+```text
+d
+```
+
+et `LogType` contient :
+
+```text
+SUPPRESSION
+```
+
+Cependant, `FileService` ne fournit actuellement pas de commande utilisateur permettant de supprimer un fichier.
+
+Le README ne considère donc pas la suppression comme une fonctionnalité disponible dans l'interface actuelle.
+
+### `help`
+
+Le message initial mentionne une commande :
+
+```text
+help
+```
+
+mais `ConsoleApp` ne contient pas actuellement de traitement `case "help"`.
+
+Elle n'est donc pas documentée comme une commande fonctionnelle.
+
+### `ls`
+
+La commande actuellement traitée est :
+
+```text
+ls
+```
+
+Le code ne distingue pas une variante `ls -l`. Cette dernière n'est donc pas considérée comme une commande distincte.
+
+### `findById` et `delete`
+
+Certaines méthodes de l'interface DAO sont encore partiellement implémentées selon le DAO concerné. Par exemple, `LogDAO.findById()` et `LogDAO.delete()` retournent actuellement des valeurs par défaut.
+
+Le projet semble donc être dans une phase d'évolution autour de la persistance SQLite.
+
+---
+
+## 🎯 Objectif du projet
+
+Line Permission permet de mettre en pratique plusieurs notions de développement Java :
+
+* programmation orientée objet ;
+* architecture en couches ;
+* séparation DAO / services / modèles ;
+* JDBC ;
+* base de données relationnelle SQLite ;
+* gestion des fichiers avec Java NIO ;
+* authentification ;
+* hashage des mots de passe ;
+* contrôle des permissions ;
+* journalisation des actions ;
+* requêtes SQL et statistiques.
+
+L'architecture peut être résumée ainsi :
+
+```text
+Utilisateur
+    │
+    ▼
+ConsoleApp
+    │
+    ▼
+Services
+    │
+    ├── AuthService
+    ├── FileService
+    └── LogsService
+    │
+    ▼
+DAO
+    │
+    ├── UserDAO
+    ├── FichierDAO
+    └── LogDAO
+    │
+    ▼
+SQLite
+```

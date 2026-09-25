@@ -1,0 +1,16 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "lineperm",
+            "database": "${workspaceFolder:line-permission}/data/lineperm.db"
+        },
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "lineperm",
+            "database": "${workspaceFolder:line-permission}/src/main/resources/data/lineperm.db"
+        }
+    ]
+}
