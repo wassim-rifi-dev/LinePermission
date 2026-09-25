@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 import ma.youcode.lineperm.constants.FilePaths;
 import ma.youcode.lineperm.dao.modelsDAO.FichierDAO;
+import ma.youcode.lineperm.dao.modelsDAO.LogDAO;
 import ma.youcode.lineperm.models.Fichier;
 import ma.youcode.lineperm.models.Log;
 import ma.youcode.lineperm.models.User;
@@ -29,37 +30,30 @@ public class FileService {
     public void touch(String fileName) {
         try {
             FichierDAO fichierDAO = new FichierDAO();
+            LogDAO logDAO = new LogDAO();
+
             Fichier fichier = fichierDAO.findByFileName(fileName);
 
-            Path logsFile = Path.of(FilePaths.LOGS_FILE);
             User currentUser = AuthService.currentUser;
 
             if (fichier != null) {
                 System.out.println("Ce file est existe.");
 
-                String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + currentUser.getUsername() + ";" + LogType.CREATION + ";" + fileName + ";" + LogResult.REFUSE;
-                Files.writeString(logsFile , logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
-
-                Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.CREATION, null, LogResult.REFUSE);
-                UserService.logs.add(log);
+                Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.CREATION, fichier, LogResult.REFUSE);
+                logDAO.save(log);
 
                 return;
             }
 
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
 
-            String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + currentUser.getUsername() + ";" + LogType.CREATION + ";" + fileName + ";" + LogResult.OK;
-
             Files.createFile(filePath);
 
             Fichier newFichier = new Fichier("rwd|---", currentUser, fileName);
             fichierDAO.save(newFichier);
 
-            Files.writeString(logsFile , logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
-
             Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.CREATION, newFichier, LogResult.OK);
-
-            UserService.logs.add(log);
+            logDAO.save(log);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -78,20 +72,18 @@ public class FileService {
     public void cat(String fileName) {
         try {
             FichierDAO fichierDAO = new FichierDAO();
+            LogDAO logDAO = new LogDAO();
+
             Fichier fichier = fichierDAO.findByFileName(fileName);
 
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
-            Path logsFile = Path.of(FilePaths.LOGS_FILE);
             User currentUser = AuthService.currentUser;
 
             if (fichier == null) {
                 System.out.println("Ce file n'existe pas.");
 
-                String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + currentUser.getUsername() + ";" + LogType.CREATION + ";" + fileName + ";" + LogResult.REFUSE;
-                Files.writeString(logsFile , logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
-
-                Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.CREATION, null, LogResult.REFUSE);
-                UserService.logs.add(log);
+                Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.CREATION, fichier, LogResult.REFUSE);
+                logDAO.save(log);
 
                 return;
             }
@@ -100,11 +92,8 @@ public class FileService {
                 String[] permissionPart = fichier.getPermissions().trim().split("\\|", 2);
 
                 if (!permissionPart[1].contains("r")) {
-                    String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + currentUser.getUsername() + ";" + LogType.LECTURE + ";" + fileName + ";" + LogResult.REFUSE;
-                    Files.writeString(logsFile, logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
-
                     Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.LECTURE, fichier, LogResult.REFUSE);
-                    UserService.logs.add(log);
+                    logDAO.save(log);
 
                     System.out.println("Vous n'avez pas l'acces.");
                     return;
@@ -113,11 +102,8 @@ public class FileService {
 
             String content = Files.readString(filePath);
 
-            String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + currentUser.getUsername() + ";" + LogType.LECTURE + ";" + fileName + ";" + LogResult.OK;
-            Files.writeString(logsFile, logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
-
             Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.LECTURE, fichier, LogResult.OK);
-            UserService.logs.add(log);
+            logDAO.save(log);
 
             System.out.println(content);
         } catch (IOException e) {
@@ -128,20 +114,19 @@ public class FileService {
     public void nano(String fileName) {
         try {
             FichierDAO fichierDAO = new FichierDAO();
+            LogDAO logDAO = new LogDAO();
+
             Fichier fichier = fichierDAO.findByFileName(fileName);
 
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
-            Path logsFile = Path.of(FilePaths.LOGS_FILE);
             User currentUser = AuthService.currentUser;
 
             if (fichier == null) {
                 System.out.println("Ce file n'existe pas.");
-                String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + currentUser.getUsername() + ";" + LogType.ECRITURE + ";" + fileName + ";" + LogResult.REFUSE;
-                Files.writeString(logsFile , logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
 
-                Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.ECRITURE, null, LogResult.REFUSE);
-                UserService.logs.add(log);
-                
+                Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.ECRITURE, fichier, LogResult.REFUSE);
+                logDAO.save(log);
+
                 return;
             }
 
@@ -149,11 +134,8 @@ public class FileService {
                 String[] permissionPart = fichier.getPermissions().trim().split("\\|", 2);
 
                 if (!permissionPart[1].contains("w")) {
-                    String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + currentUser.getUsername() + ";" + LogType.ECRITURE + ";" + fileName + ";" + LogResult.REFUSE;
-                    Files.writeString(logsFile, logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
-
                     Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.ECRITURE, fichier, LogResult.REFUSE);
-                    UserService.logs.add(log);
+                    logDAO.save(log);
 
                     System.out.println("Vous n'avez pas l'acces.");
                     return;
@@ -175,12 +157,8 @@ public class FileService {
                 }
             } while (!newContent.trim().split(" ")[0].equals("EOF"));
 
-            String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + currentUser.getUsername() + ";" + LogType.ECRITURE + ";" + fileName + ";" + LogResult.OK;
-            Files.writeString(logsFile, logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
-
             Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.ECRITURE, fichier, LogResult.OK);
-            UserService.logs.add(log);
-
+            logDAO.save(log);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -189,6 +167,8 @@ public class FileService {
     public void chmod(String fileName , String per) {
         try {
             FichierDAO fichierDAO = new FichierDAO();
+            LogDAO logDAO = new LogDAO();
+
             Fichier fichier = fichierDAO.findByFileName(fileName);
 
             User currentUser = AuthService.currentUser;
@@ -208,6 +188,9 @@ public class FileService {
             } else {
                 removePermission(fichier , per);
             }
+
+            Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.CHANGE_PERMISSION, fichier, LogResult.OK);
+            logDAO.save(log);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }
