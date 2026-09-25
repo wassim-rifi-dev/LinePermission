@@ -16,43 +16,10 @@ import ma.youcode.lineperm.models.enums.LogResult;
 import ma.youcode.lineperm.models.enums.LogType;
 
 public class UserService {
-    public static HashMap<String , Fichier> files = new HashMap<>();
     public static List<Log> logs = new ArrayList<>();
 
     public UserService() {
-        loadFiles();
         loadLogs();
-    }
-
-    public void loadFiles() {
-        try {
-            UserDAO userDAO = new UserDAO();
-            Path filesFile = Path.of(FilePaths.filesFile);
-
-            List<String> fileLines = Files.readAllLines(filesFile);
-
-            for (String line : fileLines) {
-                String[] parts = line.split(" ", 3);
-
-                if (parts.length == 3) {
-                    String permission = parts[0];
-                    String ownerUsername = parts[1];
-                    String file = parts[2];
-
-                    User owner = userDAO.findByUsername(ownerUsername);
-
-                    if (owner == null) {
-                        continue;
-                    }
-
-                    Fichier fichierProtege = new Fichier(permission, owner, file);
-
-                    files.put(file, fichierProtege);
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
-        }
     }
 
     public void loadLogs() {
@@ -75,9 +42,9 @@ public class UserService {
                                 LogResult result = LogResult.valueOf(parts[5]);
 
                                 User user = userDAO.findByUsername(username);
-                                Fichier file = files.get(fileName);
+                                // Fichier file = files.get(fileName);
 
-                                logs.add(new Log(date, time, user, type, file, result));
+                                // logs.add(new Log(date, time, user, type, file, result));
                             }
                         });
         } catch (IOException e) {
