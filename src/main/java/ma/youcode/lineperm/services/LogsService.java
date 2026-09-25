@@ -26,9 +26,7 @@ public class LogsService {
     }
 
     public void refusedLogsNumber() {
-        long number = UserService.logs.stream()
-                                .filter(log -> log.getResult() == LogResult.REFUSE)
-                                .count();
+        long number = logDAO.countRefusedLogTotal();
 
         System.out.println("Nombre refuse d'actions : " + number);
     }

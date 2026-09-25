@@ -66,4 +66,22 @@ public class LogDAO extends AbstractDAO<Log> {
 
         return 0;
     }
+
+    public long countRefusedLogTotal() {
+        String sql = "SELECT COUNT(*) FROM logs where result = REFUSE";
+
+        try (
+            Connection connection = AbstractDAO.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet result = statement.executeQuery()
+        ) {
+            if (result.next()) {
+                return result.getLong(1);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error : " + e.getMessage());
+        }
+
+        return 0;
+    }
 }
