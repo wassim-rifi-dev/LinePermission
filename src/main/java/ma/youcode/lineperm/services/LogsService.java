@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import ma.youcode.lineperm.dao.modelsDAO.LogDAO;
 import ma.youcode.lineperm.dao.modelsDAO.UserDAO;
 import ma.youcode.lineperm.models.Log;
+import ma.youcode.lineperm.models.User;
 import ma.youcode.lineperm.models.enums.LogResult;
 
 public class LogsService {
@@ -32,10 +33,7 @@ public class LogsService {
     }
 
     public void distinctUsers() {
-        List<String> users = UserService.logs.stream()
-                                        .map(log -> log.getUser().getUsername())
-                                        .distinct()
-                                        .toList();
+        List<User> users = logDAO.distinctUsers();
 
         if (users.isEmpty()) {
             System.out.println("Aucune utilisateurs a des activites.");
@@ -43,7 +41,7 @@ public class LogsService {
         }
 
         System.out.print("Utilisateurs distincts : ");
-        users.stream().forEach(user -> System.out.print(user + " | "));
+        users.stream().forEach(user -> System.out.print(user.getUsername() + " | "));
         System.out.println();
     }
 

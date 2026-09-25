@@ -7,9 +7,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
 
 import ma.youcode.lineperm.dao.AbstractDAO;
 import ma.youcode.lineperm.models.Log;
+import ma.youcode.lineperm.models.User;
 
 public class LogDAO extends AbstractDAO<Log> {
     @Override
@@ -83,5 +86,33 @@ public class LogDAO extends AbstractDAO<Log> {
         }
 
         return 0;
+    }
+
+    public List<User> distinctUsers() {
+        String sql = """
+                SELECT DISTINCT u.id, u.username, u.password
+                FROM users u
+                INNER JOIN logs l ON l.user_id = u.id;
+                """;
+
+        List<User> users = new ArrayList<>();
+
+        try (
+            Connection connection = AbstractDAO.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet result = statement.executeQuery()
+        ) {
+            while (result.next()) {
+                users.add(new User(
+                    result.getLong("id"),
+                    result.getString("username"),
+                    result.getString("password")
+                ));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error : " + e.getMessage());
+        }
+
+        return users;
     }
 }
