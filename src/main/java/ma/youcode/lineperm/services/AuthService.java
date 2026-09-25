@@ -1,60 +1,51 @@
 package ma.youcode.lineperm.services;
 
-import ma.youcode.lineperm.constants.FilePaths;
+import ma.youcode.lineperm.dao.modelsDAO.UserDAO;
 import ma.youcode.lineperm.models.User;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 
 import org.mindrot.jbcrypt.BCrypt;
 
 public class AuthService {
     public static boolean isAuth = false;
-    public static String currentUser = null;
+    public static User currentUser = null;
 
-    public void login(String username , String password) throws RuntimeException {
-        if (UserService.users.containsKey(username)) {
+    public void login(String[] userInfo) {
+        UserDAO userDAO = new UserDAO();
 
-            if (!BCrypt.checkpw(password, UserService.users.get(username).getPassword())) {
+        if (userDAO.findByUsername(userInfo[0]) != null) {
+
+            if (!BCrypt.checkpw(userInfo[1], userDAO.findByUsername(userInfo[0]).getPassword())) {
                 System.err.println("Password is incorect.\n");
                 return;
             }
 
             isAuth = true;
-            currentUser = username;
+            currentUser = new User(userDAO.findByUsername(userInfo[0]).getId() , userDAO.findByUsername(userInfo[0]).getUsername() , userDAO.findByUsername(userInfo[0]).getPassword());
 
-            System.out.println("");
+            System.out.println();
+            System.out.println("Bienvenu " + userInfo[0]);
         } else {
             System.out.println("Username not exeste.");
         }
     }
 
-    public void singUp(String username , String password) throws RuntimeException {
-        if (UserService.users.containsKey(username)) {
-            System.err.println("Ce username est existe.");
+    public void singUp(String[] userInfo)  {
+        UserDAO userDAO = new UserDAO();
+
+        if (userDAO.findByUsername(userInfo[0]) != null) {
+            System.err.println("Ce username est deja existe.");
             return;
         }
 
-        try {
-            Path userfile = Path.of(FilePaths.userFile);
+        User newUser = new User(userInfo[0], hashPassword(userInfo[1]));
 
-            String hashedPassword = hashPassword(password);
+        userDAO.save(newUser);
 
-            String userWriting = username + ":" + hashedPassword;
+        isAuth = true;
+        currentUser = newUser;
 
-            User newUser = new User(username, hashedPassword);
-
-            UserService.users.put(username, newUser);
-
-            Files.writeString(userfile, userWriting + System.lineSeparator() , StandardOpenOption.APPEND);
-
-            isAuth = true;
-            currentUser = username;
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        System.out.println("User creer en success.");
+        System.out.println();
     }
 
     public void logout() {

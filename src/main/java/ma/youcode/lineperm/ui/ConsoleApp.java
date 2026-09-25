@@ -2,11 +2,10 @@ package ma.youcode.lineperm.ui;
 
 import java.util.Scanner;
 
-import ma.youcode.lineperm.exceptions.UserAlreadyExisteException;
 import ma.youcode.lineperm.services.AuthService;
+import ma.youcode.lineperm.services.DAOService;
 import ma.youcode.lineperm.services.FileService;
 import ma.youcode.lineperm.services.LogsService;
-import ma.youcode.lineperm.services.UserService;
 
 public class ConsoleApp {
     public static String choix;
@@ -14,18 +13,18 @@ public class ConsoleApp {
     public static int statChoix;
 
     public final AuthService authService;
-    public final UserService userService;
     public final FileService fileService;
     public final LogsService logsService;
-
-    public ConsoleApp(AuthService authService , UserService userService , FileService fileService, LogsService logsService) {
-        this.authService = authService;
-        this.userService = userService;
-        this.fileService = fileService;
-        this.logsService = logsService;
-    }
+    public final DAOService daoService;
 
     Scanner scanner = new Scanner(System.in);
+
+    public ConsoleApp(AuthService authService, FileService fileService, LogsService logsService, DAOService daoService) {
+        this.authService = authService;
+        this.fileService = fileService;
+        this.logsService = logsService;
+        this.daoService = daoService;
+    }
 
     public void start() {
         System.out.println("====================== LinePerm ====================");
@@ -61,34 +60,15 @@ public class ConsoleApp {
     }
 
     public boolean notAuthDesign() {
-        userService.loadUsers();
         start();
 
         switch (ConsoleApp.choix) {
             case "signup":
-                try {
-                    String[] singupInformations = singUpChoix();
-
-                    String signUpUsername = singupInformations[0];
-                    String signUpPassword = singupInformations[1];
-
-                    authService.singUp(signUpUsername, signUpPassword);
-                } catch (UserAlreadyExisteException e) {
-                    System.out.println(e.getMessage());
-                }
+                authService.singUp(singUpChoix());
                 break;
 
             case "login":
-                try {
-                    String[] loginInformations = loginChoix();
-
-                    String loginUsername = loginInformations[0];
-                    String loginPassword = loginInformations[1];
-
-                    authService.login(loginUsername, loginPassword);
-                } catch (UserAlreadyExisteException e) {
-                    System.out.println(e.getMessage());
-                }
+                authService.login(loginChoix());
                 break;
 
                 case "stats" :
@@ -108,7 +88,7 @@ public class ConsoleApp {
     }
 
     public void isAuthDesign() {
-        System.out.print(AuthService.currentUser + "@lineperm> ");
+        System.out.print(AuthService.currentUser.getUsername() + "@lineperm> ");
         prompt = scanner.nextLine();
 
         String[] parts = ConsoleApp.prompt.trim().split(" ");

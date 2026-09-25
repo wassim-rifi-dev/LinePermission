@@ -1,31 +1,52 @@
 package ma.youcode.lineperm.models;
 
-public class FichierProtege {
+public class Fichier {
+    private Long id;
     private String permissions;
-    private String owner;
+    private User owner;
     private String fileName;
 
-    public FichierProtege(String permissions, String owner, String fileName) {
+    public Fichier(String permissions, User owner, String fileName) {
         this.permissions = permissions;
         this.owner = owner;
         this.fileName = fileName;
     }
 
+    public Fichier(Long id, String permissions, User owner, String fileName) {
+        this.id = id;
+        this.permissions = permissions;
+        this.owner = owner;
+        this.fileName = fileName;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getPermissions() {
         return permissions;
     }
+
     public void setPermissions(String permissions) {
         this.permissions = permissions;
     }
-    public String getOwner() {
+
+    public User getOwner() {
         return owner;
     }
-    public void setOwner(String owner) {
+
+    public void setOwner(User owner) {
         this.owner = owner;
     }
+
     public String getFileName() {
         return fileName;
     }
+
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
