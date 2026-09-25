@@ -4,5 +4,6 @@ public enum LogType {
     CREATION,
     LECTURE,
     ECRITURE,
+    CHANGE_PERMISSION,
     SUPPRESSION
 }
