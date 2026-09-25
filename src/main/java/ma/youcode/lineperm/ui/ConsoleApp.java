@@ -6,7 +6,6 @@ import ma.youcode.lineperm.services.AuthService;
 import ma.youcode.lineperm.services.DAOService;
 import ma.youcode.lineperm.services.FileService;
 import ma.youcode.lineperm.services.LogsService;
-import ma.youcode.lineperm.services.UserService;
 
 public class ConsoleApp {
     public static String choix;
@@ -14,20 +13,18 @@ public class ConsoleApp {
     public static int statChoix;
 
     public final AuthService authService;
-    public final UserService userService;
     public final FileService fileService;
     public final LogsService logsService;
     public final DAOService daoService;
 
-    public ConsoleApp(AuthService authService , UserService userService , FileService fileService, LogsService logsService , DAOService daoService) {
+    Scanner scanner = new Scanner(System.in);
+
+    public ConsoleApp(AuthService authService, FileService fileService, LogsService logsService, DAOService daoService) {
         this.authService = authService;
-        this.userService = userService;
         this.fileService = fileService;
         this.logsService = logsService;
         this.daoService = daoService;
     }
-
-    Scanner scanner = new Scanner(System.in);
 
     public void start() {
         System.out.println("====================== LinePerm ====================");
