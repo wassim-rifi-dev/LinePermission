@@ -5,20 +5,22 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import ma.youcode.lineperm.dao.modelsDAO.LogDAO;
 import ma.youcode.lineperm.dao.modelsDAO.UserDAO;
 import ma.youcode.lineperm.models.Log;
 import ma.youcode.lineperm.models.enums.LogResult;
 
 public class LogsService {
-
     private final Scanner scanner;
+    private final LogDAO logDAO;
 
-    public LogsService(Scanner scanner) {
+    public LogsService(Scanner scanner, LogDAO logDAO) {
         this.scanner = scanner;
+		this.logDAO = logDAO;
     }
 
     public void logsNumberTotal() {
-        long number = UserService.logs.stream().count();
+        long number = logDAO.countTotal();
 
         System.out.println("Nombre total d'actions : " + number);
     }
