@@ -75,27 +75,28 @@ public class FileService {
 
     public void cat(String fileName) {
         try {
+            FichierDAO fichierDAO = new FichierDAO();
+
             Path filePath = Path.of(FilePaths.mainFilesDiractories + fileName);
             Path logsFile = Path.of(FilePaths.LOGS_FILE);
             User currentUser = AuthService.currentUser;
 
-            if (!UserService.files.containsKey(fileName)) {
+            if (fichierDAO.findByFileName(fileName) == null) {
                 System.out.println("Ce file n'existe pas.");
-                String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + currentUser.getUsername() + ";" + LogType.LECTURE + ";" + fileName + ";" + LogResult.REFUSE;
+
+                String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + currentUser.getUsername() + ";" + LogType.CREATION + ";" + fileName + ";" + LogResult.REFUSE;
                 Files.writeString(logsFile , logWriting + System.lineSeparator(), StandardOpenOption.APPEND);
 
-                Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.LECTURE, null, LogResult.REFUSE);
+                Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.CREATION, null, LogResult.REFUSE);
                 UserService.logs.add(log);
 
                 return;
             }
 
-            Fichier fichier = UserService.files.get(fileName);
-            User fileOwner = fichier.getOwner();
-            String filePermission = fichier.getPermissions();
+            Fichier fichier = fichierDAO.findByFileName(fileName);
 
-            if (!fileOwner.getUsername().equals(currentUser.getUsername())) {
-                String[] permissionPart = filePermission.trim().split("\\|", 2);
+            if (!fichier.getOwner().getUsername().equals(currentUser.getUsername())) {
+                String[] permissionPart = fichier.getPermissions().trim().split("\\|", 2);
 
                 if (!permissionPart[1].contains("r")) {
                     String logWriting = LocalDate.now() + ";" + LocalTime.now().withSecond(0).withNano(0) + ";" + currentUser.getUsername() + ";" + LogType.LECTURE + ";" + fileName + ";" + LogResult.REFUSE;
