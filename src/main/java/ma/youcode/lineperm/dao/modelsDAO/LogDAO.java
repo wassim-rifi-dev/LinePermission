@@ -167,16 +167,15 @@ public class LogDAO extends AbstractDAO<Log> {
 
     public long userLogRefused(String user) {
         String sql = """
-                SELECT COUNT(l.id) AS nombre_refuse
-                FROM logs l
-                INNER JOIN users u ON l.user_id = u.id
-                WHERE u.username = ? AND l.result = 'REFUSE';
-            """;
+                    SELECT COUNT(l.id) AS nombre_refuse
+                    FROM logs l
+                    INNER JOIN users u ON l.user_id = u.id
+                    WHERE u.username = ? AND l.result = 'REFUSE';
+                """;
 
         try (
-            Connection connection = AbstractDAO.getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql)
-        ) {
+                Connection connection = AbstractDAO.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user);
 
             try (ResultSet result = statement.executeQuery()) {
@@ -189,5 +188,30 @@ public class LogDAO extends AbstractDAO<Log> {
             System.out.println("Error : " + e.getMessage());
         }
         return 0;
+    }
+
+    public String actifUser() {
+        String sql = """
+                SELECT u.username, COUNT(l.id) AS nombre_logs
+                FROM users u
+                INNER JOIN logs l ON l.user_id = u.id
+                GROUP BY u.id, u.username
+                ORDER BY nombre_logs DESC
+                LIMIT 1;
+                """;
+
+        try (
+                Connection connection = AbstractDAO.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql);
+                ResultSet result = statement.executeQuery()) {
+            if (result.next()) {
+                return result.getString("username");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error : " + e.getMessage());
+        }
+
+        return null;
     }
 }

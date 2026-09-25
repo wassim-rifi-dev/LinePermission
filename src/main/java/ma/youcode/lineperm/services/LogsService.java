@@ -83,16 +83,9 @@ public class LogsService {
     }
 
     public void actifUser() {
-        String user = UserService.logs.stream()
-                                .collect(Collectors.groupingBy(
-                                    log -> log.getUser().getUsername(),
-                                    Collectors.counting()
-                                ))
-                                .entrySet()
-                                .stream()
-                                .max(Map.Entry.comparingByValue())
-                                .map(Map.Entry::getKey)
-                                .orElse("Aucune utilisateur n'existe.");
+        LogDAO logDAO = new LogDAO();
+
+        String user = logDAO.actifUser();
 
         System.out.println("L'utilisateur le plus actif est : " + user);
     }
