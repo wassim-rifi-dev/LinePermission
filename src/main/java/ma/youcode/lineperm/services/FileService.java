@@ -55,7 +55,7 @@ public class FileService {
             Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.CREATION, newFichier, LogResult.OK);
             logDAO.save(log);
         } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
+            System.out.println("Error : " + e.getMessage());
         }
     }
 
@@ -107,7 +107,7 @@ public class FileService {
 
             System.out.println(content);
         } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
+            System.out.println("Error : " + e.getMessage());
         }
     }
 
@@ -160,7 +160,7 @@ public class FileService {
             Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.ECRITURE, fichier, LogResult.OK);
             logDAO.save(log);
         } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
+            System.out.println("Error : " + e.getMessage());
         }
     }
 
@@ -180,6 +180,10 @@ public class FileService {
 
             if (!fichier.getOwner().getUsername().equals(currentUser.getUsername())) {
                 System.out.println("Vous n'avez pas l'acces.");
+
+                Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.CHANGE_PERMISSION, fichier, LogResult.REFUSE);
+                logDAO.save(log);
+                
                 return;
             }
 
@@ -192,7 +196,7 @@ public class FileService {
             Log log = new Log(LocalDate.now(), LocalTime.now().withSecond(0).withNano(0), currentUser, LogType.CHANGE_PERMISSION, fichier, LogResult.OK);
             logDAO.save(log);
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
+            System.out.println("Error : " + e.getMessage());
         }
     }
 

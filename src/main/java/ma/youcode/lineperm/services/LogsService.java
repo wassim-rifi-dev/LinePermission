@@ -3,13 +3,10 @@ package ma.youcode.lineperm.services;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 import ma.youcode.lineperm.dao.modelsDAO.LogDAO;
 import ma.youcode.lineperm.dao.modelsDAO.UserDAO;
-import ma.youcode.lineperm.models.Log;
 import ma.youcode.lineperm.models.User;
-import ma.youcode.lineperm.models.enums.LogResult;
 
 public class LogsService {
     private final Scanner scanner;
