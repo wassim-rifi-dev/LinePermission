@@ -22,9 +22,8 @@ public class LogDAO extends AbstractDAO<Log> {
         String sql = "INSERT INTO logs (log_date, log_time, user_id, type, file_id, result) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (
-            Connection connection = AbstractDAO.getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql , Statement.RETURN_GENERATED_KEYS);
-        ) {
+                Connection connection = AbstractDAO.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
             statement.setDate(1, Date.valueOf(log.getDate()));
             statement.setTime(2, Time.valueOf(log.getTime()));
             statement.setLong(3, log.getUser().getId());
@@ -58,10 +57,9 @@ public class LogDAO extends AbstractDAO<Log> {
         String sql = "SELECT COUNT(*) FROM logs";
 
         try (
-            Connection connection = AbstractDAO.getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql);
-            ResultSet result = statement.executeQuery()
-        ) {
+                Connection connection = AbstractDAO.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql);
+                ResultSet result = statement.executeQuery()) {
             if (result.next()) {
                 return result.getLong(1);
             }
@@ -76,10 +74,9 @@ public class LogDAO extends AbstractDAO<Log> {
         String sql = "SELECT COUNT(*) FROM logs where result = REFUSE";
 
         try (
-            Connection connection = AbstractDAO.getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql);
-            ResultSet result = statement.executeQuery()
-        ) {
+                Connection connection = AbstractDAO.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql);
+                ResultSet result = statement.executeQuery()) {
             if (result.next()) {
                 return result.getLong(1);
             }
@@ -100,16 +97,14 @@ public class LogDAO extends AbstractDAO<Log> {
         List<User> users = new ArrayList<>();
 
         try (
-            Connection connection = AbstractDAO.getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql);
-            ResultSet result = statement.executeQuery()
-        ) {
+                Connection connection = AbstractDAO.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql);
+                ResultSet result = statement.executeQuery()) {
             while (result.next()) {
                 users.add(new User(
-                    result.getLong("id"),
-                    result.getString("username"),
-                    result.getString("password")
-                ));
+                        result.getLong("id"),
+                        result.getString("username"),
+                        result.getString("password")));
             }
         } catch (SQLException e) {
             System.out.println("Error : " + e.getMessage());
@@ -129,10 +124,9 @@ public class LogDAO extends AbstractDAO<Log> {
         Map<String, Long> logsByUser = new HashMap<>();
 
         try (
-            Connection connection = AbstractDAO.getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql);
-            ResultSet result = statement.executeQuery()
-        ) {
+                Connection connection = AbstractDAO.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql);
+                ResultSet result = statement.executeQuery()) {
             while (result.next()) {
                 logsByUser.put(result.getString("username"), result.getLong("nombre_logs"));
             }
@@ -142,5 +136,58 @@ public class LogDAO extends AbstractDAO<Log> {
         }
 
         return logsByUser;
+    }
+
+    public List<String> topThreeFile() {
+        String sql = """
+                SELECT f.file_name, COUNT(l.id) AS nombre_logs
+                FROM fichiers f
+                INNER JOIN logs l ON l.file_id = f.id
+                GROUP BY f.id, f.file_name
+                ORDER BY nombre_logs DESC
+                LIMIT 3;
+                """;
+
+        List<String> topThreeFiles = new ArrayList<>();
+
+        try (
+                Connection connection = AbstractDAO.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql);
+                ResultSet result = statement.executeQuery()) {
+            while (result.next()) {
+                topThreeFiles.add(result.getString("file_name"));
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error : " + e.getMessage());
+        }
+
+        return topThreeFiles;
+    }
+
+    public long userLogRefused(String user) {
+        String sql = """
+                SELECT COUNT(l.id) AS nombre_refuse
+                FROM logs l
+                INNER JOIN users u ON l.user_id = u.id
+                WHERE u.username = ? AND l.result = 'REFUSE';
+            """;
+
+        try (
+            Connection connection = AbstractDAO.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+            statement.setString(1, user);
+
+            try (ResultSet result = statement.executeQuery()) {
+                if (result.next()) {
+                    return result.getLong("nombre_refuse");
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error : " + e.getMessage());
+        }
+        return 0;
     }
 }

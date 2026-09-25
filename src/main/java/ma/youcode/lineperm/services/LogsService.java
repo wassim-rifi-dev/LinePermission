@@ -60,18 +60,7 @@ public class LogsService {
     }
 
     public void topThreeFile() {
-        List<String> topThreeFiles = UserService.logs.stream()
-                                                .filter(log -> log.getFile() != null)
-                                                .collect(Collectors.groupingBy(
-                                                    log -> log.getFile().getFileName(),
-                                                    Collectors.counting()
-                                                ))
-                                                .entrySet()
-                                                .stream()
-                                                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                                                .limit(3)
-                                                .map(Map.Entry::getKey)
-                                                .toList();
+        List<String> topThreeFiles = logDAO.topThreeFile();
 
         System.out.println("Le top 3 fichier : ");
         topThreeFiles.stream().forEach(f -> System.out.println("   - " + f));
@@ -88,10 +77,7 @@ public class LogsService {
             return;
         }
 
-        long refusedLogUser = UserService.logs.stream()
-                                            .filter(log -> log.getResult() == LogResult.REFUSE)
-                                            .filter(log -> log.getUser().getUsername().equals(user))
-                                            .count();
+        long refusedLogUser = logDAO.userLogRefused(user);
 
         System.out.println("Nombre refuse d'actions pour " + user + " : " + refusedLogUser);
     }
