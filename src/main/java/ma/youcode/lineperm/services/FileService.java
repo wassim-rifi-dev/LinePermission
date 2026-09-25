@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -187,93 +188,70 @@ public class FileService {
 
     public void chmod(String fileName , String per) {
         try {
+            FichierDAO fichierDAO = new FichierDAO();
+            Fichier fichier = fichierDAO.findByFileName(fileName);
+
             User currentUser = AuthService.currentUser;
 
-            if (!UserService.files.containsKey(fileName)) {
+            if (fichier == null) {
                 System.out.println("Ce file n'existe pas.");
                 return;
             }
 
-            User fileOwner = UserService.files.get(fileName).getOwner();
-
-            if (!fileOwner.getUsername().equals(currentUser.getUsername())) {
+            if (!fichier.getOwner().getUsername().equals(currentUser.getUsername())) {
                 System.out.println("Vous n'avez pas l'acces.");
                 return;
             }
 
-            Path filesFile = Path.of(FilePaths.filesFile);
-
-            List<String> fileLines = Files.readAllLines(filesFile);
-
             if (!per.startsWith("-")) {
-                addPermision(fileLines, fileName, fileOwner, per, filesFile);
+                addPermision(fichier , per);
             } else {
-                removePermission(fileLines, fileName, fileOwner, per, filesFile);
+                removePermission(fichier , per);
             }
-        } catch (IOException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
 
-    private void addPermision(List<String> fileLines , String fileName , User fileOwner , String per , Path filesFile) throws IOException {
-        for (int i = 0 ; i < fileLines.size() ; i++) {
-            if (fileLines.get(i).contains(fileName) && fileLines.get(i).contains(fileOwner.getUsername())) {
-                String[] parts = fileLines.get(i).trim().split(" ");
+    private void addPermision(Fichier fichier , String newPermission) throws SQLException {
+        FichierDAO fichierDAO = new FichierDAO();
 
-                String[] perPart = parts[0].trim().split("\\|");
+        String[] perPart = fichier.getPermissions().trim().split("\\|");
+        String newOtherPer = perPart[1];
 
-                String newOtherPer = perPart[1];
-
-                for (char permission : per.toCharArray()) {
-                    if (permission == 'r') {
-                        newOtherPer = "r" + newOtherPer.substring(1);
-                    } else if (permission == 'w') {
-                        newOtherPer = "rw" + newOtherPer.substring(2);
-                    } else if (permission == 'd') {
-                        newOtherPer = "rwd";
-                    }
-                }
-
-                String newLine = "rwd|" + newOtherPer + " " + fileOwner.getUsername() + " " + fileName;
-
-                Fichier fichierProtege = new Fichier("rwd|" + newOtherPer , fileOwner, fileName);
-
-                UserService.files.put(fileName, fichierProtege);
-                fileLines.set(i, newLine);
-                Files.write(filesFile, fileLines);
-                break;
+        for (char permission : newPermission.toCharArray()) {
+            if (permission == 'r') {
+                newOtherPer = "r" + newOtherPer.substring(1);
+            } else if (permission == 'w') {
+                newOtherPer = "rw" + newOtherPer.substring(2);
+            } else if (permission == 'd') {
+                newOtherPer = "rwd";
             }
         }
+
+        newPermission = "rwd|" + newOtherPer;
+
+        fichierDAO.updatePermissions(fichier.getId() , newPermission);
     }
 
-    private void removePermission(List<String> fileLines , String fileName , User fileOwner , String per , Path filesFile) throws IOException {
-        for (int i = 0; i < fileLines.size(); i++) {
-            if (fileLines.get(i).contains(fileName) && fileLines.get(i).contains(fileOwner.getUsername())) {
-                String[] parts = fileLines.get(i).trim().split(" ");
+    private void removePermission(Fichier fichier , String newPermission) throws SQLException {
+        FichierDAO fichierDAO = new FichierDAO();
 
-                String[] perPart = parts[0].trim().split("\\|");
+        String[] perPart = fichier.getPermissions().trim().split("\\|");
+        String newOtherPer = perPart[1];
 
-                String newOtherPer = perPart[1];
-
-                for (char permission : per.toCharArray()) {
-                    if (permission == 'r') {
-                        newOtherPer = "---";
-                    } else if (permission == 'w') {
-                        newOtherPer = newOtherPer.substring(0 , 1)  + "--";
-                    } else if (permission == 'd') {
-                        newOtherPer = newOtherPer.substring(0 , 2) + "-";
-                    }
-                }
-
-                String newLine = "rwd|" + newOtherPer + " " + fileOwner.getUsername() + " " + fileName;
-
-                Fichier fichierProtege = new Fichier("rwd|" + newOtherPer , fileOwner, fileName);
-
-                UserService.files.put(fileName, fichierProtege);
-                fileLines.set(i, newLine);
-                Files.write(filesFile, fileLines);
-                break;
+        for (char permission : newPermission.toCharArray()) {
+            if (permission == 'r') {
+                newOtherPer = "---";
+            } else if (permission == 'w') {
+                newOtherPer = newOtherPer.substring(0 , 1)  + "--";
+            } else if (permission == 'd') {
+                newOtherPer = newOtherPer.substring(0 , 2) + "-";
             }
         }
+
+        newPermission = "rwd|" + newOtherPer;
+
+        fichierDAO.updatePermissions(fichier.getId() , newPermission);
     }
 }
